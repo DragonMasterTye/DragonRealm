@@ -3,6 +3,7 @@
 
 #include "DragonRealm/Public/DR_Character.h"
 
+#include "DR_MagicProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -55,6 +56,18 @@ void ADR_Character::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
+void ADR_Character::PrimaryAttack()
+{
+	FVector HandLocation = GetMesh()->GetSocketLocation("Magic_R_Socket");
+	
+	FTransform SpawnTransform = FTransform(GetActorRotation(),HandLocation);
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransform, SpawnParams);
+}
+
 /*void ADR_Character::Turn(float Value)
 {
 	
@@ -79,6 +92,8 @@ void ADR_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("MoveForward", this, &ADR_Character::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ADR_Character::MoveRight);
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);	
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ADR_Character::PrimaryAttack);
 }
 

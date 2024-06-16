@@ -13,6 +13,11 @@ class DRAGONREALM_API ADR_Character : public ACharacter
 {
 	GENERATED_BODY()
 
+protected:
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
+
 public:
 	// Sets default values for this character's properties
 	ADR_Character();
@@ -32,6 +37,9 @@ protected:
 
 	/*void Turn(float Value);
 	void LookUp(float Value);*/
+
+	// Attacks
+	void PrimaryAttack();
 	
 public:	
 	// Called every frame
