@@ -3,6 +3,7 @@
 
 #include "DragonRealm/Public/DR_Character.h"
 
+#include "DR_InteractionComponent.h"
 #include "DR_MagicProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -20,6 +21,8 @@ ADR_Character::ADR_Character()
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	InteractionComponent = CreateDefaultSubobject<UDR_InteractionComponent>("InteractionComponent");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
@@ -57,6 +60,13 @@ void ADR_Character::MoveRight(float Value)
 }
 
 void ADR_Character::PrimaryAttack()
+{	
+	PlayAnimMontage(AttackMontage);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ADR_Character::PrimaryAttack_TimeElapsed, 0.2f);
+}
+
+void ADR_Character::PrimaryAttack_TimeElapsed()
 {
 	FVector HandLocation = GetMesh()->GetSocketLocation("Magic_R_Socket");
 	
@@ -95,5 +105,15 @@ void ADR_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ADR_Character::PrimaryAttack);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADR_Character::PrimaryInteract);
+}
+
+void ADR_Character::PrimaryInteract()
+{
+	if(InteractionComponent)
+	{
+		InteractionComponent->PrimaryInteract();
+	}
 }
 

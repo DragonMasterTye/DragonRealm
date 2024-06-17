@@ -3,31 +3,36 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "DR_GameplayInterface.h"
 #include "GameFramework/Actor.h"
-#include "DR_ExplosiveBarrel.generated.h"
+#include "DR_ItemChest.generated.h"
 
-class URadialForceComponent;
 UCLASS()
-class DRAGONREALM_API ADR_ExplosiveBarrel : public AActor
+class DRAGONREALM_API ADR_ItemChest : public AActor, public IDR_GameplayInterface
 {
 	GENERATED_BODY()
+
+public:
+
+	UPROPERTY(EditAnywhere)
+	float TargetPitch;
+	
+	void Interact_Implementation(APawn* InstigatorPawn);
 
 protected:
 
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComponent;
+	UStaticMeshComponent* BaseMesh;
 	UPROPERTY(VisibleAnywhere)
-	URadialForceComponent* RadialForceComponent;
+	UStaticMeshComponent* LidMesh;
 	
 public:	
 	// Sets default values for this actor's properties
-	ADR_ExplosiveBarrel();
+	ADR_ItemChest();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-
-	void Explode();
 
 public:	
 	// Called every frame

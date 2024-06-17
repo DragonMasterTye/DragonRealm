@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DR_Character.generated.h"
 
+class UDR_InteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 UCLASS()
@@ -15,8 +16,12 @@ class DRAGONREALM_API ADR_Character : public ACharacter
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category="Attack")
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere, Category="Attack")
+	UAnimMontage* AttackMontage;
+	
+	FTimerHandle TimerHandle_PrimaryAttack;
 
 public:
 	// Sets default values for this character's properties
@@ -30,6 +35,8 @@ protected:
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
+	UPROPERTY(VisibleAnywhere)
+	UDR_InteractionComponent* InteractionComponent;
 
 	// Movement Functions
 	void MoveForward(float Value);
@@ -40,6 +47,7 @@ protected:
 
 	// Attacks
 	void PrimaryAttack();
+	void PrimaryAttack_TimeElapsed();
 	
 public:	
 	// Called every frame
@@ -47,5 +55,7 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	void PrimaryInteract();
 
 };

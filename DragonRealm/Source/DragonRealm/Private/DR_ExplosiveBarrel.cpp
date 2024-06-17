@@ -18,11 +18,16 @@ ADR_ExplosiveBarrel::ADR_ExplosiveBarrel()
 	RadialForceComponent->SetupAttachment(StaticMeshComponent);
 }
 
+void ADR_ExplosiveBarrel::Explode()
+{
+	RadialForceComponent->FireImpulse();
+}
+
 // Called when the game starts or when spawned
 void ADR_ExplosiveBarrel::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//StaticMeshComponent->OnComponentHit.AddDynamic(this, &ADR_ExplosiveBarrel::Explode);
 }
 
 // Called every frame
