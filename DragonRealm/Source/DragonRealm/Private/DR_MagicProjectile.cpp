@@ -15,6 +15,8 @@ ADR_MagicProjectile::ADR_MagicProjectile()
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetCollisionProfileName("Projectile");
+	SphereComponent->MoveIgnoreActors.Add(GetInstigator());
+	SphereComponent->MoveIgnoreActors.Add(GetOwner());
 	RootComponent = SphereComponent;
 
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComponent");

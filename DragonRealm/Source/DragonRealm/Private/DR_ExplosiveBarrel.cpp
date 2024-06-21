@@ -8,32 +8,48 @@
 // Sets default values
 ADR_ExplosiveBarrel::ADR_ExplosiveBarrel()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
+	MeshComponent->SetSimulatePhysics(true);
+	RootComponent = MeshComponent;
 
-	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
-	RootComponent = StaticMeshComponent;
+	ForceComponent = CreateDefaultSubobject<URadialForceComponent>("ForceComponent");
+	ForceComponent->SetupAttachment(MeshComponent);
 
-	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>("RadialForceComponent");
-	RadialForceComponent->SetupAttachment(StaticMeshComponent);
+	// Leaving this on would apply constant force, we only want a burst
+	ForceComponent->SetAutoActivate(false);
+
+	ForceComponent->Radius = 750.0f;
+	
+	ForceComponent->ImpulseStrength = 2000.0f;
+	ForceComponent->bImpulseVelChange = true; // Ignores Mass so we don't have to do real world calculations
+
+	ForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
 }
 
-void ADR_ExplosiveBarrel::Explode()
+void ADR_ExplosiveBarrel::PostInitializeComponents()
 {
-	RadialForceComponent->FireImpulse();
+	Super::PostInitializeComponents();
+
+	MeshComponent->OnComponentHit.AddDynamic(this, &ADR_ExplosiveBarrel::OnHit);
 }
 
-// Called when the game starts or when spawned
-void ADR_ExplosiveBarrel::BeginPlay()
+void ADR_ExplosiveBarrel::OnHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
 {
-	Super::BeginPlay();
-	//StaticMeshComponent->OnComponentHit.AddDynamic(this, &ADR_ExplosiveBarrel::Explode);
+	if(OtherActor->GetInstigator() || this->GetVelocity().Length() > 1000.0f)
+	{
+		Explode();
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("OnHit in Explosive Barrel"));
+
+	UE_LOG(LogTemp, Log, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
+
+	FString CombinedString = FString::Printf(TEXT("Hit at Location: %s"), *Hit.ImpactPoint.ToString());
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
 
-// Called every frame
-void ADR_ExplosiveBarrel::Tick(float DeltaTime)
+void ADR_ExplosiveBarrel::Explode_Implementation()
 {
-	Super::Tick(DeltaTime);
-
+	ForceComponent->FireImpulse();
 }
-

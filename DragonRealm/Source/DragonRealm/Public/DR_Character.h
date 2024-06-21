@@ -14,15 +14,6 @@ class DRAGONREALM_API ADR_Character : public ACharacter
 {
 	GENERATED_BODY()
 
-protected:
-
-	UPROPERTY(EditAnywhere, Category="Attack")
-	TSubclassOf<AActor> ProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Attack")
-	UAnimMontage* AttackMontage;
-	
-	FTimerHandle TimerHandle_PrimaryAttack;
-
 public:
 	// Sets default values for this character's properties
 	ADR_Character();
@@ -31,23 +22,47 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere)
+	// Components
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USpringArmComponent* SpringArmComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCameraComponent* CameraComponent;
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UDR_InteractionComponent* InteractionComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UArrowComponent* AbilityArrowComponent;
 
+	// Variables / Properties
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TSubclassOf<AActor> PrimaryAttackProjectileClass;
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TSubclassOf<AActor> UltProjectileClass;
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	UAnimMontage* AttackMontage;
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	FName AbilitySpawnSocket = "Magic_R_Socket";
+
+	// Timers
+	FTimerHandle TimerHandle_PrimaryAttack;
+	FTimerHandle TimerHandle_UltAbility;
+	
 	// Movement Functions
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+	//void Turn(float Value);
+	//void LookUp(float Value);
 
-	/*void Turn(float Value);
-	void LookUp(float Value);*/
-
-	// Attacks
+	// Abilities
 	void PrimaryAttack();
 	void PrimaryAttack_TimeElapsed();
+	void UltAbility();
+	void UltAbility_TimeElapsed();
+
+	// Interaction
+	void PrimaryInteract();
+
+	// Utilities
+	FRotator CalculateAimRotation();
 	
 public:	
 	// Called every frame
@@ -55,7 +70,5 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	void PrimaryInteract();
 
 };

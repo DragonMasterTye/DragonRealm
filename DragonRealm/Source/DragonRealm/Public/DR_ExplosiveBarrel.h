@@ -11,26 +11,24 @@ UCLASS()
 class DRAGONREALM_API ADR_ExplosiveBarrel : public AActor
 {
 	GENERATED_BODY()
-
-protected:
-
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* StaticMeshComponent;
-	UPROPERTY(VisibleAnywhere)
-	URadialForceComponent* RadialForceComponent;
 	
 public:	
 	// Sets default values for this actor's properties
 	ADR_ExplosiveBarrel();
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UStaticMeshComponent* MeshComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	URadialForceComponent* ForceComponent;
+	
+	virtual void PostInitializeComponents() override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintNativeEvent)
 	void Explode();
-
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	
 };
