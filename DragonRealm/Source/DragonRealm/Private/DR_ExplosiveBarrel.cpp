@@ -30,11 +30,11 @@ void ADR_ExplosiveBarrel::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	MeshComponent->OnComponentHit.AddDynamic(this, &ADR_ExplosiveBarrel::OnHit);
+	MeshComponent->OnComponentBeginOverlap.AddDynamic(this, &ADR_ExplosiveBarrel::OnActorOverlap);
 }
 
-void ADR_ExplosiveBarrel::OnHit_Implementation(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	FVector NormalImpulse, const FHitResult& Hit)
+void ADR_ExplosiveBarrel::OnActorOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if(OtherActor->GetInstigator() || this->GetVelocity().Length() > 1000.0f)
 	{
@@ -45,8 +45,8 @@ void ADR_ExplosiveBarrel::OnHit_Implementation(UPrimitiveComponent* HitComponent
 
 	UE_LOG(LogTemp, Log, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
 
-	FString CombinedString = FString::Printf(TEXT("Hit at Location: %s"), *Hit.ImpactPoint.ToString());
-	DrawDebugString(GetWorld(), Hit.ImpactPoint, CombinedString, nullptr, FColor::Green, 2.0f, true);
+	FString CombinedString = FString::Printf(TEXT("Hit at Location: %s"), *GetActorLocation().ToString());
+	DrawDebugString(GetWorld(), GetActorLocation(), CombinedString, nullptr, FColor::Green, 2.0f, true);
 }
 
 void ADR_ExplosiveBarrel::Explode_Implementation()

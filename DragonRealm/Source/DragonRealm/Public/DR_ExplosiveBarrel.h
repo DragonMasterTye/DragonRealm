@@ -24,9 +24,9 @@ protected:
 	URadialForceComponent* ForceComponent;
 	
 	virtual void PostInitializeComponents() override;
-
+	
 	UFUNCTION(BlueprintNativeEvent)
-	void OnHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, FVector NormalImpulse, const FHitResult& Hit);
+	void OnActorOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void Explode();

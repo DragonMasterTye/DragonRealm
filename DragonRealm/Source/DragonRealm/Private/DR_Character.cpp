@@ -4,6 +4,7 @@
 #include "DragonRealm/Public/DR_Character.h"
 
 #include "DR_InteractionComponent.h"
+#include "DR_AttributeComponent.h"
 #include "DR_MagicProjectile.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
@@ -18,6 +19,7 @@ ADR_Character::ADR_Character()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// Physical Attributes
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->bUsePawnControlRotation = true;
@@ -25,13 +27,15 @@ ADR_Character::ADR_Character()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-	InteractionComponent = CreateDefaultSubobject<UDR_InteractionComponent>("InteractionComponent");
-
 	AbilityArrowComponent = CreateDefaultSubobject<UArrowComponent>("AbilityArrowComponent");
 	AbilityArrowComponent->SetupAttachment(GetMesh(), AbilitySpawnSocket);
 
+	// Imaginary Components
+	InteractionComponent = CreateDefaultSubobject<UDR_InteractionComponent>("InteractionComponent");
+	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
+	
+	// Setting Defaults
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-
 	bUseControllerRotationYaw = false;
 }
 

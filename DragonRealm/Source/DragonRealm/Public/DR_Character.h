@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DR_Character.generated.h"
 
+class UDR_AttributeComponent;
 class UDR_InteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -22,15 +23,20 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	// Components
+	// Physical Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCameraComponent* CameraComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UDR_InteractionComponent* InteractionComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UArrowComponent* AbilityArrowComponent;
+	
+	// Imaginary Components
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+    UDR_InteractionComponent* InteractionComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDR_AttributeComponent* AttributeComponent;
+    
 
 	// Variables / Properties
 	UPROPERTY(EditAnywhere, Category="Abilities")

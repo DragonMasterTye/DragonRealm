@@ -17,6 +17,7 @@ void UDR_AttributeComponent::BeginPlay()
 bool UDR_AttributeComponent::ApplyHealthChange(float Delta)
 {
 	CurrentHealth += Delta;
+	
 	return true;
 }
 
