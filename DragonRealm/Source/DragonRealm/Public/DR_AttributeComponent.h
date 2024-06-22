@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "DR_AttributeComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCurrentHealthChanged, AActor*, Instigator, UDR_AttributeComponent*, OwningComponent, float, NewHealth, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRAGONREALM_API UDR_AttributeComponent : public UActorComponent
@@ -18,6 +19,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(float Delta);
+
+	UPROPERTY(BlueprintAssignable, Category = "Attributes")
+	FOnCurrentHealthChanged OnCurrentHealthChanged;
 
 protected:
 	// Called when the game starts

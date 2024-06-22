@@ -17,6 +17,8 @@ void UDR_AttributeComponent::BeginPlay()
 bool UDR_AttributeComponent::ApplyHealthChange(float Delta)
 {
 	CurrentHealth += Delta;
+
+	OnCurrentHealthChanged.Broadcast(nullptr, this, CurrentHealth, Delta);
 	
 	return true;
 }
