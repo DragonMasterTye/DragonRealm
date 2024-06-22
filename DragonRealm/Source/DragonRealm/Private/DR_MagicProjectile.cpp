@@ -19,6 +19,7 @@ ADR_MagicProjectile::ADR_MagicProjectile()
 	// Components
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetCollisionProfileName("Projectile");
+	SphereComponent->SetCollisionObjectType(ECC_GameTraceChannel1);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ADR_MagicProjectile::OnActorOverlap);
 	RootComponent = SphereComponent;
 
@@ -45,25 +46,23 @@ void ADR_MagicProjectile::BeginPlay()
 void ADR_MagicProjectile::OnActorOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
 	UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if(OtherActor)
+	if(OtherActor && OtherActor != GetInstigator())
 	{
-		if(OtherActor != GetInstigator())
+		UDR_AttributeComponent* AttributeComp = Cast<UDR_AttributeComponent>(OtherActor->GetComponentByClass(UDR_AttributeComponent::StaticClass()));
+		if(AttributeComp)
 		{
-			UDR_AttributeComponent* AttributeComp = Cast<UDR_AttributeComponent>(OtherActor->GetComponentByClass(UDR_AttributeComponent::StaticClass()));
-			if(AttributeComp)
-			{
-				AttributeComp->ApplyHealthChange(-20.f);
-			}
-
-			/*if(ensureAlways(ImpactVFX))
-			{
-				// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Impact, GetActorLocation());
-
-				UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactVFX, GetActorLocation());
-			}*/
-			
-			Destroy();
+			AttributeComp->ApplyHealthChange(-20.f);
 		}
+
+		/*if(ensureAlways(ImpactVFX))
+		{
+			// UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), NS_Impact, GetActorLocation());
+
+			UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ImpactVFX, GetActorLocation());
+		}*/
+		
+		Destroy();
+
 	}
 }
 
