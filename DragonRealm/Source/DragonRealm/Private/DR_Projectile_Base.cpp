@@ -1,0 +1,60 @@
+// Copyright Landon Morrison 2024
+
+
+#include "DR_Projectile_Base.h"
+#include "DR_AttributeComponent.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Particles/ParticleSystemComponent.h"
+
+// Sets default values
+ADR_Projectile_Base::ADR_Projectile_Base()
+{
+	// Components
+	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+	SphereComponent->SetCollisionProfileName("Projectile");
+	SphereComponent->SetCollisionObjectType(ECC_GameTraceChannel1);
+	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ADR_Projectile_Base::OnActorOverlap);
+	RootComponent = SphereComponent;
+
+	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComponent");
+	ParticleSystemComponent->SetupAttachment(RootComponent);
+
+	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	MeshComponent->SetupAttachment(SphereComponent);
+
+	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
+	ProjectileMovementComponent->InitialSpeed = 1000.0f;
+	ProjectileMovementComponent->bRotationFollowsVelocity = true;
+	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;
+}
+
+void ADR_Projectile_Base::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
+}
+
+void ADR_Projectile_Base::Explode_Implementation()
+{
+	if(ensure(!IsPendingKillPending()))
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
+
+		UGameplayStatics::PlaySoundAtLocation(this, ImpactSFX, GetActorLocation(), GetActorRotation());
+
+		Destroy();
+	}
+}
+
+void ADR_Projectile_Base::OnActorOverlap_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor,
+                                                        UPrimitiveComponent* OtherComponent, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if(OtherActor && OtherActor != GetInstigator())
+	{
+		Explode();
+	}
+}
+
