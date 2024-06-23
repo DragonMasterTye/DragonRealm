@@ -10,16 +10,16 @@ void ADR_AIController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(ensureAlways(BehaviorTree))
+	if(ensureMsgf(BehaviorTree, TEXT("BehaviorTree is nullptr! Please assign BehaviorTree in your AI Controller")))
 	{
 		RunBehaviorTree(BehaviorTree);
 	}
 
-	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	/*APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	if(PlayerPawn)
 	{
 		GetBlackboardComponent()->SetValueAsVector("MoveToLocation", PlayerPawn->GetActorLocation());
 		GetBlackboardComponent()->SetValueAsObject("TargetActor", PlayerPawn);
 
-	}
+	}*/
 }

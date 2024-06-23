@@ -39,7 +39,7 @@ protected:
 	UDR_AttributeComponent* AttributeComponent;
     
 
-	// Variables / Properties
+	//  Properties
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	TSubclassOf<ADR_Projectile_Base> PrimaryAttackProjectileClass;
 	UPROPERTY(EditAnywhere, Category="Abilities")

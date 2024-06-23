@@ -3,32 +3,39 @@
 
 #include "DR_AICharacter_Base.h"
 
+#include "AIController.h"
+#include "DR_AttributeComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/PawnSensingComponent.h"
+
 // Sets default values
 ADR_AICharacter_Base::ADR_AICharacter_Base()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
+	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
 }
 
-// Called when the game starts or when spawned
-void ADR_AICharacter_Base::BeginPlay()
+void ADR_AICharacter_Base::PostInitializeComponents()
 {
-	Super::BeginPlay();
-	
+	Super::PostInitializeComponents();
+	PawnSensingComponent->OnSeePawn.AddDynamic(this, &ADR_AICharacter_Base::OnPawnSeen);
 }
 
-// Called every frame
-void ADR_AICharacter_Base::Tick(float DeltaTime)
+bool ADR_AICharacter_Base::IsAlive()
 {
-	Super::Tick(DeltaTime);
-
+	return AttributeComponent->IsAlive();
 }
 
-// Called to bind functionality to input
-void ADR_AICharacter_Base::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ADR_AICharacter_Base::OnPawnSeen_Implementation(APawn* Pawn)
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	AAIController* AIC = Cast<AAIController>(GetController());
+	if(AIC)
+	{
+		UBlackboardComponent* BBComp = AIC->GetBlackboardComponent();
 
+		BBComp->SetValueAsObject("TargetActor", Pawn);
+
+		DrawDebugString(GetWorld(), GetActorLocation(), "PLAYER SPOTTED", nullptr, FColor::White, 4.0f, true);
+	}
 }
 
