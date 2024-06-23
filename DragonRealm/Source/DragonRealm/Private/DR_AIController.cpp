@@ -1,0 +1,25 @@
+// Copyright Landon Morrison 2024
+
+
+#include "DR_AIController.h"
+
+#include "BehaviorTree/BlackboardComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+void ADR_AIController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if(ensureAlways(BehaviorTree))
+	{
+		RunBehaviorTree(BehaviorTree);
+	}
+
+	APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	if(PlayerPawn)
+	{
+		GetBlackboardComponent()->SetValueAsVector("MoveToLocation", PlayerPawn->GetActorLocation());
+		GetBlackboardComponent()->SetValueAsObject("TargetActor", PlayerPawn);
+
+	}
+}
