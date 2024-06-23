@@ -26,8 +26,6 @@ protected:
 	USphereComponent* SphereComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UParticleSystemComponent* ParticleSystemComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UStaticMeshComponent* MeshComponent;
 
 	// Imaginary Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

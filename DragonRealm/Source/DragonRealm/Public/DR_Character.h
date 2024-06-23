@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DR_Character.generated.h"
 
+class ADR_Projectile_Base;
 class UDR_AttributeComponent;
 class UDR_InteractionComponent;
 class UCameraComponent;
@@ -40,9 +41,11 @@ protected:
 
 	// Variables / Properties
 	UPROPERTY(EditAnywhere, Category="Abilities")
-	TSubclassOf<AActor> PrimaryAttackProjectileClass;
+	TSubclassOf<ADR_Projectile_Base> PrimaryAttackProjectileClass;
 	UPROPERTY(EditAnywhere, Category="Abilities")
-	TSubclassOf<AActor> UltProjectileClass;
+	TSubclassOf<ADR_Projectile_Base> UltProjectileClass;
+	UPROPERTY(EditAnywhere, Category="Abilities")
+	TSubclassOf<ADR_Projectile_Base> DashProjectileClass;
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, Category="Abilities")
@@ -51,6 +54,7 @@ protected:
 	// Timers
 	FTimerHandle TimerHandle_PrimaryAttack;
 	FTimerHandle TimerHandle_UltAbility;
+	FTimerHandle TimerHandle_DashAbility;
 	
 	// Movement Functions
 	void MoveForward(float Value);
@@ -63,12 +67,23 @@ protected:
 	void PrimaryAttack_TimeElapsed();
 	void UltAbility();
 	void UltAbility_TimeElapsed();
+	void DashAbility();
+	void DashAbility_TimeElapsed();
 
 	// Interaction
 	void PrimaryInteract();
 
 	// Utilities
 	FRotator CalculateAimRotation();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Abilities")
+	void SpawnProjectile(TSubclassOf<ADR_Projectile_Base> ProjectileClass);
+
+	// Functions
+	UFUNCTION()
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth, float Delta);
+
+	// Unreal Functions
+	virtual void PostInitializeComponents() override;
 	
 public:	
 	// Called every frame

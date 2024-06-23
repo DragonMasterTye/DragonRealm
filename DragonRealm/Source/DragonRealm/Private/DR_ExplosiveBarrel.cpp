@@ -46,29 +46,30 @@ void ADR_ExplosiveBarrel::OnActorOverlap_Implementation(UPrimitiveComponent* Ove
 	if(OtherActor->GetInstigator() || this->GetVelocity().Length() > 1000.0f)
 	{		
 		Explode();
-
-		TArray<AActor*> OverlappingActors;
-		GetOverlappingActors(OverlappingActors);
-		for (auto OverlappingActor : OverlappingActors)
-		{
-			UDR_AttributeComponent* AttributeComponent = Cast<UDR_AttributeComponent>(OverlappingActor->GetComponentByClass(UDR_AttributeComponent::StaticClass()));
-		
-			if(AttributeComponent)
-			{
-				AttributeComponent->ApplyHealthChange(-90.f);
-			}
-		}
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnStaticMeshBeginOverlap in Explosive Barrel"));
 
 	UE_LOG(LogTemp, Log, TEXT("OtherActor: %s, at game time: %f"), *GetNameSafe(OtherActor), GetWorld()->TimeSeconds);
 
-	FString CombinedString = FString::Printf(TEXT("Overlap at Location: %s"), *GetActorLocation().ToString());
+	FString CombinedString = FString::Printf(TEXT("Overlap at Location: %s "), *GetActorLocation().ToString());
 	DrawDebugString(GetWorld(), GetActorLocation(), CombinedString, nullptr, FColor::Green, 2.0f, true);
+	
 }
 
 void ADR_ExplosiveBarrel::Explode_Implementation()
 {
+	TArray<AActor*> OverlappingActors;
+	SphereComponent->GetOverlappingActors(OverlappingActors);
+	for (auto OverlappingActor : OverlappingActors)
+	{
+		UDR_AttributeComponent* AttributeComponent = Cast<UDR_AttributeComponent>(OverlappingActor->GetComponentByClass(UDR_AttributeComponent::StaticClass()));
+		
+		if(AttributeComponent)
+		{
+			AttributeComponent->ApplyHealthChange(-90.f);
+		}
+	}
+	
 	ForceComponent->FireImpulse();
 }

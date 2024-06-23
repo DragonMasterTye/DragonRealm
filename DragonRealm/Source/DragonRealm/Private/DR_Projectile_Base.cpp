@@ -2,7 +2,6 @@
 
 
 #include "DR_Projectile_Base.h"
-#include "DR_AttributeComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -10,9 +9,10 @@
 
 // Sets default values
 ADR_Projectile_Base::ADR_Projectile_Base()
-{
+{	
 	// Components
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
+	SphereComponent->SetEnableGravity(false);
 	SphereComponent->SetCollisionProfileName("Projectile");
 	SphereComponent->SetCollisionObjectType(ECC_GameTraceChannel1);
 	SphereComponent->OnComponentBeginOverlap.AddDynamic(this, &ADR_Projectile_Base::OnActorOverlap);
@@ -21,11 +21,8 @@ ADR_Projectile_Base::ADR_Projectile_Base()
 	ParticleSystemComponent = CreateDefaultSubobject<UParticleSystemComponent>("ParticleSystemComponent");
 	ParticleSystemComponent->SetupAttachment(RootComponent);
 
-	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
-	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComponent->SetupAttachment(SphereComponent);
-
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
+	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
 	ProjectileMovementComponent->InitialSpeed = 1000.0f;
 	ProjectileMovementComponent->bRotationFollowsVelocity = true;
 	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;

@@ -22,6 +22,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
 	FOnCurrentHealthChanged OnCurrentHealthChanged;
+	UFUNCTION(BlueprintCallable)
+	bool IsAlive() const;
 
 protected:
 	// Called when the game starts

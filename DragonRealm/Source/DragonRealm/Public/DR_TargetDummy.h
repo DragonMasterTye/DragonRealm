@@ -27,8 +27,11 @@ protected:
 	UPROPERTY(VisibleAnywhere)
 	UDR_AttributeComponent* AttributeComponent;
 
+	// Unreal Functions
+	virtual void PostInitializeComponents() override;
+
 	// Functions
-	UFUNCTION()
-	void OnHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth, float Delta);
+	UFUNCTION(BlueprintNativeEvent)
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth, float Delta);
 
 };

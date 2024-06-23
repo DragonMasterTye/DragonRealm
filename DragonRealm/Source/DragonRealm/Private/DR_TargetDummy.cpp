@@ -12,12 +12,19 @@ ADR_TargetDummy::ADR_TargetDummy()
 	RootComponent = Mesh;
 
 	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
-	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADR_TargetDummy::OnHealthChanged);
 
 }
 
-void ADR_TargetDummy::OnHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth,
-	float Delta)
+
+void ADR_TargetDummy::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADR_TargetDummy::OnCurrentHealthChanged);
+}
+
+void ADR_TargetDummy::OnCurrentHealthChanged_Implementation(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth,
+                                             float Delta)
 {
 	if(ensureAlways(Mesh))
 	{

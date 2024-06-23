@@ -9,6 +9,18 @@ UDR_AttributeComponent::UDR_AttributeComponent()
 	CurrentHealth = MaxHealth;
 }
 
+bool UDR_AttributeComponent::IsAlive() const
+{
+	if(CurrentHealth > 0)
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 void UDR_AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();

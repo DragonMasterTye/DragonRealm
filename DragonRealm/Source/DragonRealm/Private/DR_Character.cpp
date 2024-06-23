@@ -5,13 +5,12 @@
 
 #include "DR_InteractionComponent.h"
 #include "DR_AttributeComponent.h"
-#include "DR_MagicProjectile.h"
+#include "DR_Projectile_Base.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ADR_Character::ADR_Character()
@@ -37,6 +36,13 @@ ADR_Character::ADR_Character()
 	// Setting Defaults
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
+}
+
+void ADR_Character::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADR_Character::OnCurrentHealthChanged);
 }
 
 // Called when the game starts or when spawned
@@ -78,17 +84,7 @@ void ADR_Character::PrimaryAttack()
 
 void ADR_Character::PrimaryAttack_TimeElapsed()
 {
-	FTransform SpawnTransform = FTransform(CalculateAimRotation(),AbilityArrowComponent->GetComponentLocation());
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = this;
-
-	if(ensureAlways(PrimaryAttackProjectileClass))
-	{
-		GetWorld()->SpawnActor<AActor>(PrimaryAttackProjectileClass, SpawnTransform, SpawnParams);
-	}
+	SpawnProjectile(PrimaryAttackProjectileClass);
 }
 
 void ADR_Character::UltAbility()
@@ -100,17 +96,19 @@ void ADR_Character::UltAbility()
 
 void ADR_Character::UltAbility_TimeElapsed()
 {
-	FTransform SpawnTransform = FTransform(CalculateAimRotation(),AbilityArrowComponent->GetComponentLocation());
+	SpawnProjectile(UltProjectileClass);
+}
 
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Owner = this;
-	SpawnParams.Instigator = this;
+void ADR_Character::DashAbility()
+{
+	PlayAnimMontage(AttackMontage);
+	
+	GetWorldTimerManager().SetTimer(TimerHandle_DashAbility, this, &ADR_Character::DashAbility_TimeElapsed, 0.2f);
+}
 
-	if(ensureAlways(UltProjectileClass))
-	{
-		GetWorld()->SpawnActor<AActor>(UltProjectileClass, SpawnTransform, SpawnParams);
-	}
+void ADR_Character::DashAbility_TimeElapsed()
+{
+	SpawnProjectile(DashProjectileClass);
 }
 
 /*void ADR_Character::Turn(float Value)
@@ -121,6 +119,23 @@ void ADR_Character::UltAbility_TimeElapsed()
 void ADR_Character::LookUp(float Value)
 {
 }*/
+
+void ADR_Character::OnCurrentHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent,
+	float NewHealth, float Delta)
+{
+	if(NewHealth <= 0.f && Delta < 0.f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+	}
+	
+	if(Delta < 0.f)
+	{
+		// Turn on MF_DR_HitFlash
+		GetMesh()->SetScalarParameterValueOnMaterials("DR_TimeToHitFlash", GetWorld()->TimeSeconds);
+	}
+	
+}
 
 // Called every frame
 void ADR_Character::Tick(float DeltaTime)
@@ -141,6 +156,7 @@ void ADR_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ADR_Character::PrimaryAttack);
 	PlayerInputComponent->BindAction("UltAbility", IE_Pressed, this, &ADR_Character::UltAbility);
+	PlayerInputComponent->BindAction("DashAbility", IE_Pressed, this, &ADR_Character::DashAbility);
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADR_Character::PrimaryInteract);
 }
@@ -156,24 +172,52 @@ void ADR_Character::PrimaryInteract()
 FRotator ADR_Character::CalculateAimRotation()
 {
 	FRotator ReturnValue;
-	
-	FVector SpawnLocation = AbilityArrowComponent->GetComponentLocation();
-	FRotator SpawnRotation = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraRotation();
 
+	FCollisionShape Shape;
+	Shape.SetSphere(20.f);
+
+	// Ignore Player
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	FCollisionObjectQueryParams ObjectParams;
+	ObjectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectParams.AddObjectTypesToQuery(ECC_WorldStatic);
+	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
+	
+	FVector TraceStart = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
+	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000.f);
+	
 	FHitResult Hit;
-	FVector Start = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
-	FVector End = SpawnLocation + (SpawnRotation.Vector() * 10000.f);
 
-	bool bBlockingHit = GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility);
-	if(bBlockingHit)
-	{
-		ReturnValue = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, Hit.ImpactPoint);
-	}
-	else
-	{
-		ReturnValue = UKismetMathLibrary::FindLookAtRotation(SpawnLocation, End);
-	}
+	//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 3.f);
 	
+	if(GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjectParams, Shape, QueryParams))
+	{
+		TraceEnd = Hit.ImpactPoint;		
+	}
+
+	FVector SpawnLocation = AbilityArrowComponent->GetComponentLocation();
+
+	ReturnValue = FRotationMatrix::MakeFromX(TraceEnd - SpawnLocation).Rotator();
+
+	//DrawDebugLine(GetWorld(), SpawnLocation, TraceEnd, FColor::Red, false, 3.f);
+
 	return ReturnValue;
+}
+
+void ADR_Character::SpawnProjectile_Implementation(TSubclassOf<ADR_Projectile_Base> ProjectileClass)
+{
+	if(ensureAlways(ProjectileClass))
+	{
+		FTransform SpawnTransform = FTransform(CalculateAimRotation(),AbilityArrowComponent->GetComponentLocation());
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		SpawnParams.Owner = this;
+		SpawnParams.Instigator = this;
+		
+		GetWorld()->SpawnActor<ADR_Projectile_Base>(ProjectileClass, SpawnTransform, SpawnParams);
+	}
 }
 
