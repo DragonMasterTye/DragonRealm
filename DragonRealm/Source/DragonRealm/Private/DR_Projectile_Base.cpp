@@ -28,6 +28,13 @@ ADR_Projectile_Base::ADR_Projectile_Base()
 	ProjectileMovementComponent->bInitialVelocityInLocalSpace = true;
 }
 
+void ADR_Projectile_Base::BeginPlay()
+{
+	Super::BeginPlay();
+
+	UGameplayStatics::SpawnEmitterAtLocation(this, SpawnVFX, GetActorLocation(), GetActorRotation());
+}
+
 void ADR_Projectile_Base::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();

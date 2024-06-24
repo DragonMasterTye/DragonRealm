@@ -17,6 +17,8 @@ public:
 	// Sets default values for this actor's properties
 	ADR_Projectile_Base();
 
+	virtual void BeginPlay() override;
+
 protected:
 	// Unreal functions
 	virtual void PostInitializeComponents() override;
@@ -32,6 +34,8 @@ protected:
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
 	// Effects
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UParticleSystem* SpawnVFX;
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 	UParticleSystem* ImpactVFX;
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")

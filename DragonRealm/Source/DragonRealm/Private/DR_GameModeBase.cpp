@@ -58,7 +58,7 @@ void ADR_GameModeBase::DR_KillAllAI()
 
 void ADR_GameModeBase::SpawnBotTimerElapsed()
 {
-	if(CVarSpawnBots.GetValueOnGameThread())
+	if(!CVarSpawnBots.GetValueOnGameThread())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Bot spawning diasbled via CVAR: DR.SpawnBots"));
 		return;

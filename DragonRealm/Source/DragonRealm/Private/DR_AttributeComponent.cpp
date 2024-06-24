@@ -60,7 +60,7 @@ void UDR_AttributeComponent::BeginPlay()
 
 bool UDR_AttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
-	if(!GetOwner()->CanBeDamaged())
+	if(!GetOwner()->CanBeDamaged() && Delta < 0.f)
 	{
 		return false;
 	}

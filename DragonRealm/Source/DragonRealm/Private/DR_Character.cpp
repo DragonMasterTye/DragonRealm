@@ -8,6 +8,7 @@
 #include "DR_Projectile_Base.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -22,6 +23,10 @@ ADR_Character::ADR_Character()
 	TimeOfHitParamName = "DR_TimeOfHit";
 	
 	// Physical(Scene) Components
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->bUsePawnControlRotation = true;
@@ -46,6 +51,11 @@ void ADR_Character::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADR_Character::OnCurrentHealthChanged);
+}
+
+FVector ADR_Character::GetPawnViewLocation() const
+{
+	return CameraComponent->GetComponentLocation();
 }
 
 // Called when the game starts or when spawned
@@ -131,10 +141,14 @@ void ADR_Character::OnCurrentHealthChanged(AActor* InstigatorActor, UDR_Attribut
 		// Turn on MF_DR_HitFlash
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
 
+		// Died
 		if(NewHealth <= 0.f)
 		{
 			APlayerController* PC = Cast<APlayerController>(GetController());
 			DisableInput(PC);
+
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 
 			SetLifeSpan(10.f);
 		}

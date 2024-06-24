@@ -9,15 +9,23 @@
 #include "DR_WorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
 // Sets default values
 ADR_AICharacter_Base::ADR_AICharacter_Base()
 {
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
+	
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
 
 	TimeOfHitParamName = "DR_TimeOfHit";
+
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
 }
 
@@ -51,6 +59,7 @@ void ADR_AICharacter_Base::OnCurrentHealthChanged(AActor* InstigatorActor, UDR_A
 			SetTargetActor(InstigatorActor);
 		}
 
+		// Died
 		if(NewHealth <= 0.0f)
 		{
 			// Stop BT
@@ -66,6 +75,10 @@ void ADR_AICharacter_Base::OnCurrentHealthChanged(AActor* InstigatorActor, UDR_A
 
 			// Remove Health Bar
 			ActiveHealthBar->RemoveFromParent();
+
+			// Set Collision and disable movement
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			GetCharacterMovement()->DisableMovement();
 			
 			SetLifeSpan(10.0f);
 		}
