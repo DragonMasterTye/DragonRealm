@@ -13,6 +13,7 @@ ADR_TargetDummy::ADR_TargetDummy()
 
 	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
 
+	TimeOfHitParamName = "DR_TimeOfHit";
 }
 
 
@@ -31,7 +32,7 @@ void ADR_TargetDummy::OnCurrentHealthChanged_Implementation(AActor* InstigatorAc
 		if(Delta < 0)
 		{
 			// Turn on MF_DR_HitFlash
-			Mesh->SetScalarParameterValueOnMaterials("DR_TimeToHitFlash", GetWorld()->TimeSeconds);
+			Mesh->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
 		}
 	}
 }

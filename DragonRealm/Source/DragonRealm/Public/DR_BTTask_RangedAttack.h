@@ -14,13 +14,17 @@ class DRAGONREALM_API UDR_BTTask_RangedAttack : public UBTTaskNode
 {
 	GENERATED_BODY()
 
+	UDR_BTTask_RangedAttack();
+	
+	// Unreal Functions
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
 protected:
 
 	// Properties
 	UPROPERTY(EditAnywhere, Category = "AI")
 	TSubclassOf<AActor> ProjectileClass;
-	
-	// Unreal Functions
-	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-	
+
+	UPROPERTY(EditAnywhere, Category = "AI")
+	float MaxBulletSpread;
 };

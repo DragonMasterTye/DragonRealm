@@ -6,6 +6,11 @@
 #include "AIController.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
+UDR_BTService_CheckAttackRange::UDR_BTService_CheckAttackRange()
+{
+	AttackRange = 1000.f;
+}
+
 void UDR_BTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
@@ -26,7 +31,7 @@ void UDR_BTService_CheckAttackRange::TickNode(UBehaviorTreeComponent& OwnerComp,
 				{
 					float DistanceTo = FVector::Distance(TargetActor->GetActorLocation(), AIPawn->GetActorLocation());
 
-					bool bWithinRange = DistanceTo < 1000.f;
+					bool bWithinRange = DistanceTo < AttackRange;
 					bool bHasLOS = false;
 					if(bWithinRange)
 					{

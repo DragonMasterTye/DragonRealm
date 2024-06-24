@@ -49,7 +49,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, Category="Abilities")
-	FName AbilitySpawnSocket = "Magic_R_Socket";
+	FName AbilitySpawnSocket;
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeOfHitParamName;
 
 	// Timers
 	FTimerHandle TimerHandle_PrimaryAttack;

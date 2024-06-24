@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "DR_AttributeComponent.generated.h"
 
+class UDR_AttributeComponent; // Forward declare to make the DELEGATE shut up
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCurrentHealthChanged, AActor*, Instigator, UDR_AttributeComponent*, OwningComponent, float, NewHealth, float, Delta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -13,12 +14,17 @@ class DRAGONREALM_API UDR_AttributeComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:	
-	// Sets default values for this component's properties
+public:
+
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	static UDR_AttributeComponent* GetAttributes(AActor* FromActor);
+	UFUNCTION(BlueprintCallable, Category = "Abilities")
+	static bool IsActorAlive(AActor* FromActor);
+
 	UDR_AttributeComponent();
 
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(float Delta);
+	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
 
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
 	FOnCurrentHealthChanged OnCurrentHealthChanged;

@@ -17,8 +17,11 @@ ADR_Character::ADR_Character()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-	// Physical Attributes
+	
+	AbilitySpawnSocket = "Magic_R_Socket";
+	TimeOfHitParamName = "DR_TimeOfHit";
+	
+	// Physical(Scene) Components
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->bUsePawnControlRotation = true;
@@ -29,7 +32,7 @@ ADR_Character::ADR_Character()
 	AbilityArrowComponent = CreateDefaultSubobject<UArrowComponent>("AbilityArrowComponent");
 	AbilityArrowComponent->SetupAttachment(GetMesh(), AbilitySpawnSocket);
 
-	// Imaginary Components
+	// Imaginary(Actor) Components
 	InteractionComponent = CreateDefaultSubobject<UDR_InteractionComponent>("InteractionComponent");
 	AttributeComponent = CreateDefaultSubobject<UDR_AttributeComponent>("AttributeComponent");
 	
@@ -122,17 +125,19 @@ void ADR_Character::LookUp(float Value)
 
 void ADR_Character::OnCurrentHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent,
 	float NewHealth, float Delta)
-{
-	if(NewHealth <= 0.f && Delta < 0.f)
-	{
-		APlayerController* PC = Cast<APlayerController>(GetController());
-		DisableInput(PC);
-	}
-	
+{	
 	if(Delta < 0.f)
 	{
 		// Turn on MF_DR_HitFlash
-		GetMesh()->SetScalarParameterValueOnMaterials("DR_TimeToHitFlash", GetWorld()->TimeSeconds);
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
+
+		if(NewHealth <= 0.f)
+		{
+			APlayerController* PC = Cast<APlayerController>(GetController());
+			DisableInput(PC);
+
+			SetLifeSpan(10.f);
+		}
 	}
 	
 }

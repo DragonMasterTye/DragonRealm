@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DR_AICharacter_Base.generated.h"
 
+class UDR_WorldUserWidget;
 class UDR_AttributeComponent;
 class UPawnSensingComponent;
 
@@ -30,12 +31,24 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDR_AttributeComponent* AttributeComponent;
 
+	// Properties
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeOfHitParamName;
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	TSubclassOf<UUserWidget> HealthBarWidgetClass;
+	// UPROPERTY()
+	UDR_WorldUserWidget* ActiveHealthBar;
+
 	// Unreal Functions
 	virtual void PostInitializeComponents() override;
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent)
 	void OnPawnSeen(APawn* Pawn);
+	UFUNCTION()
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDR_AttributeComponent* OwningComponent, float NewHealth, float Delta);
 
+	// Utilities
+	void SetTargetActor(AActor* NewTarget);
 	
 };

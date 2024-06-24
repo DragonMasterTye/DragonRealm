@@ -63,11 +63,11 @@ void ADR_ExplosiveBarrel::Explode_Implementation()
 	SphereComponent->GetOverlappingActors(OverlappingActors);
 	for (auto OverlappingActor : OverlappingActors)
 	{
-		UDR_AttributeComponent* AttributeComponent = Cast<UDR_AttributeComponent>(OverlappingActor->GetComponentByClass(UDR_AttributeComponent::StaticClass()));
+		UDR_AttributeComponent* AttributeComponent = UDR_AttributeComponent::GetAttributes(OverlappingActor);
 		
 		if(AttributeComponent)
 		{
-			AttributeComponent->ApplyHealthChange(-90.f);
+			AttributeComponent->ApplyHealthChange(this, -90.f);
 		}
 	}
 	

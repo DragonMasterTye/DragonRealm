@@ -19,13 +19,17 @@ public:
 
 protected:
 
-	// Physical Components
+	// Physical(Scene) Components
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* Mesh;
 
-	// Imaginary Components
+	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere)
 	UDR_AttributeComponent* AttributeComponent;
+
+	// Properties
+	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	FName TimeOfHitParamName;
 
 	// Unreal Functions
 	virtual void PostInitializeComponents() override;
