@@ -26,6 +26,13 @@ public:
 	// Unreal Functions
 	virtual void StartPlay() override;
 
+	// Functions
+	virtual void OnActorKilled(AActor* Victim, AActor* Killer);
+
+	// Console Functions
+	UFUNCTION(Exec)
+	void DR_KillAllAI();
+
 protected:
 
 	// Properties
@@ -37,6 +44,8 @@ protected:
 	TSubclassOf<AActor>MinionClass;
 	UPROPERTY(EditDefaultsOnly, Category = "AI")
 	UEnvQuery* SpawnBotQuery;
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float RespawnDelay;
 
 	// Timer
 	FTimerHandle TimerHandle_SpawnBots;
@@ -44,8 +53,9 @@ protected:
 	// Functions
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
-
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	UFUNCTION()
+	void OnRespawnPlayerTimerElapsed(AController* Controller);
 	
 };

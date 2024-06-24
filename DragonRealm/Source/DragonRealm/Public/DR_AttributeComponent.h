@@ -16,20 +16,21 @@ class DRAGONREALM_API UDR_AttributeComponent : public UActorComponent
 
 public:
 
+	UDR_AttributeComponent();
+	
+	// Functions
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	static UDR_AttributeComponent* GetAttributes(AActor* FromActor);
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	static bool IsActorAlive(AActor* FromActor);
-
-	UDR_AttributeComponent();
-
 	UFUNCTION(BlueprintCallable, Category = "Attributes")
 	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
-
 	UPROPERTY(BlueprintAssignable, Category = "Attributes")
 	FOnCurrentHealthChanged OnCurrentHealthChanged;
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
+	UFUNCTION(BlueprintCallable)
+	bool Kill(AActor* InstigatorActor);
 
 protected:
 	// Called when the game starts

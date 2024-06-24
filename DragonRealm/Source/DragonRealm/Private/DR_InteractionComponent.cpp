@@ -5,6 +5,8 @@
 #include "DR_GameplayInterface.h"
 #include "DrawDebugHelpers.h"
 
+static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("DR.DebugDrawInteraction"), false, TEXT("Enable Debug lines for InteractionComponent"), ECVF_Cheat);
+
 // Sets default values for this component's properties
 UDR_InteractionComponent::UDR_InteractionComponent()
 {
@@ -35,6 +37,8 @@ void UDR_InteractionComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 
 void UDR_InteractionComponent::PrimaryInteract()
 {
+	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
+	
 	FCollisionObjectQueryParams ObjectQueryParams;
 	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
 
@@ -61,6 +65,11 @@ void UDR_InteractionComponent::PrimaryInteract()
 
 	for (FHitResult Hit : Hits)
 	{
+		if(bDebugDraw)
+		{
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 16, LineColor, false, 2.0f);
+		}
+		
 		AActor* HitActor = Hit.GetActor();
 		if(HitActor)
 		{
@@ -72,10 +81,10 @@ void UDR_InteractionComponent::PrimaryInteract()
 				break;
 			}
 		}
-
-		DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 16, LineColor, false, 2.0f);
 	}
 	
-	DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
-
+	if(bDebugDraw)
+	{
+		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
+	}
 }

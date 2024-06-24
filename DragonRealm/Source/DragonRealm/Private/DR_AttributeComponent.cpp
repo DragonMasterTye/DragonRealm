@@ -3,6 +3,11 @@
 
 #include "DR_AttributeComponent.h"
 
+#include "DR_GameModeBase.h"
+#include "Kismet/GameplayStatics.h"
+
+static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("DR.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for AttributeComponent"), ECVF_Cheat);
+
 // Sets default values for this component's properties
 UDR_AttributeComponent::UDR_AttributeComponent()
 {
@@ -43,6 +48,11 @@ bool UDR_AttributeComponent::IsAlive() const
 	}
 }
 
+bool UDR_AttributeComponent::Kill(AActor* InstigatorActor)
+{
+	return ApplyHealthChange(InstigatorActor, -MaxHealth);
+}
+
 void UDR_AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
@@ -50,11 +60,30 @@ void UDR_AttributeComponent::BeginPlay()
 
 bool UDR_AttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
+	if(!GetOwner()->CanBeDamaged())
+	{
+		return false;
+	}
+
+	if(Delta < 0.f)
+	{
+		Delta *= CVarDamageMultiplier.GetValueOnGameThread();
+	}
+	
 	float OldHealth = CurrentHealth;
 	CurrentHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
 	float ActualDelta = CurrentHealth - OldHealth;
-
 	OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, ActualDelta);
+
+	// Died
+	if(ActualDelta < 0.f && CurrentHealth <= 0.f)
+	{
+		ADR_GameModeBase* GM = GetWorld()->GetAuthGameMode<ADR_GameModeBase>();
+		if(GM)
+		{
+			GM->OnActorKilled(GetOwner(), InstigatorActor);
+		}
+	}
 	
 	return ActualDelta != 0;
 }

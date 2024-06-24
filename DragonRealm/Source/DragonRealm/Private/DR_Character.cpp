@@ -166,6 +166,11 @@ void ADR_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADR_Character::PrimaryInteract);
 }
 
+void ADR_Character::DR_HealSelf(float Amount /* = 100 */)
+{
+	AttributeComponent->ApplyHealthChange(this, Amount);
+}
+
 void ADR_Character::PrimaryInteract()
 {
 	if(InteractionComponent)

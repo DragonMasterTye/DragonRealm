@@ -14,6 +14,8 @@ class DRAGONREALM_API UDR_WorldUserWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+
+	// 
 	
 	// Properties
 	UPROPERTY(BlueprintReadOnly, Category = "UI")
