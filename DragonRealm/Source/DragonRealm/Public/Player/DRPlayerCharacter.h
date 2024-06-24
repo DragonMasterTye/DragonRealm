@@ -43,13 +43,13 @@ protected:
     
 
 	//  Properties
-	UPROPERTY(EditAnywhere, Category="Abilities")
+	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> PrimaryAttackProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Abilities")
+	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> UltProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Abilities")
+	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> DashProjectileClass;
-	UPROPERTY(EditAnywhere, Category="Abilities")
+	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	UAnimMontage* AttackMontage;
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	FName AbilitySpawnSocket;

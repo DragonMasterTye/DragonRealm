@@ -14,7 +14,7 @@ class DRAGONREALM_API UDRAction : public UObject
 public:
 
 	// Properties
-	UPROPERTY(EditDefaultsOnly, Category = "DR|Actions")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
 	FName ActionName;
 
 	// Functions
