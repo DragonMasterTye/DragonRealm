@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/NoExportTypes.h"
 #include "DRAction.generated.h"
 
+class UDRActionComponent;
 class UWorld;
 UCLASS(Blueprintable)
 class DRAGONREALM_API UDRAction : public UObject
@@ -26,5 +28,17 @@ public:
 	void StartAction(AActor* Instigator); // Since this is a UObject, we don't already have an Instigator so this is a safe name
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
 	void StopAction(AActor* Instigator);
+
+protected:
+
+	// Properties
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
+	FGameplayTagContainer GrantsTags;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
+	FGameplayTagContainer BlockedByTags;
+
+	// Functions
+	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
+	UDRActionComponent* GetOwningComponent() const;
 	
 };

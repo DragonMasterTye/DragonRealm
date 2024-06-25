@@ -5,6 +5,8 @@
 
 #include "ActionSystem/DRAction.h"
 
+static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), true, TEXT("Enable Debug messages and logs for Tags"), ECVF_Cheat);
+
 // Ctor
 UDRActionComponent::UDRActionComponent()
 {
@@ -19,6 +21,18 @@ void UDRActionComponent::BeginPlay()
 	for(TSubclassOf<UDRAction> ActionClass : DefaultActions)
 	{
 		AddAction(ActionClass);
+	}
+}
+
+void UDRActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
+	FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if(CVarDebugTags.GetValueOnGameThread())
+	{
+		FString DebugMessage = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
 	}
 }
 

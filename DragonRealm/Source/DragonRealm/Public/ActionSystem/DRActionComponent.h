@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Components/ActorComponent.h"
 #include "DRActionComponent.generated.h"
 
@@ -16,6 +17,10 @@ class DRAGONREALM_API UDRActionComponent : public UActorComponent
 public:	
 	// Ctor
 	UDRActionComponent();
+
+	// Properties
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
+	FGameplayTagContainer ActiveGameplayTags;
 
 	// Functions
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
@@ -35,4 +40,5 @@ protected:
 
 	// Unreal Functions
 	virtual void BeginPlay() override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };
