@@ -26,16 +26,13 @@ public:
 	bool StopActionByName(AActor* Instigator, FName ActionName);
 
 protected:
-
-	virtual void BeginPlay() override;
-
+	
 	// Properties
 	UPROPERTY()
 	TArray<UDRAction*> Actions;
+	UPROPERTY(EditAnywhere, Category = "DR|Actions")
+	TArray<TSubclassOf<UDRAction>> DefaultActions;
 
-public:	
-
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
+	// Unreal Functions
+	virtual void BeginPlay() override;
 };

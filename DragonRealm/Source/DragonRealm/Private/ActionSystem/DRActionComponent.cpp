@@ -5,20 +5,21 @@
 
 #include "ActionSystem/DRAction.h"
 
-// Unreal Functions
+// Ctor
 UDRActionComponent::UDRActionComponent()
 {
-	PrimaryComponentTick.bCanEverTick = true;
+	
 }
 
+// Unreal Functions
 void UDRActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
-void UDRActionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	for(TSubclassOf<UDRAction> ActionClass : DefaultActions)
+	{
+		AddAction(ActionClass);
+	}
 }
 
 // Functions ----------------------------------------------------------

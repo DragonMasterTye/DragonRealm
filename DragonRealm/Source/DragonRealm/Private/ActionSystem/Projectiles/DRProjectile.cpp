@@ -7,6 +7,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
+static TAutoConsoleVariable<bool> CVarDebugProjectile(TEXT("DR.DebugProjectile"), true, TEXT("Enable Debug messages, logs, and draws for Proejctiles"), ECVF_Cheat);
+
 // Sets default values
 ADRProjectile::ADRProjectile()
 {	

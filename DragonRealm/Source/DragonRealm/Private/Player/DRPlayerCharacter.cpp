@@ -14,15 +14,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
+// Ctor
 ADRPlayerCharacter::ADRPlayerCharacter()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	
-	AbilitySpawnSocket = "Magic_R_Socket";
-	TimeOfHitParamName = "DR_TimeOfHit";
-	
+
 	// Physical(Scene) Components
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
@@ -35,9 +31,6 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-	AbilityArrowComponent = CreateDefaultSubobject<UArrowComponent>("AbilityArrowComponent");
-	AbilityArrowComponent->SetupAttachment(GetMesh(), AbilitySpawnSocket);
-
 	// Imaginary(Actor) Components
 	InteractionComponent = CreateDefaultSubobject<UDRInteractionComponent>("InteractionComponent");
 	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
@@ -48,6 +41,7 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+// Unreal Functions
 void ADRPlayerCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -55,18 +49,35 @@ void ADRPlayerCharacter::PostInitializeComponents()
 	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADRPlayerCharacter::OnCurrentHealthChanged);
 }
 
+void ADRPlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
 FVector ADRPlayerCharacter::GetPawnViewLocation() const
 {
 	return CameraComponent->GetComponentLocation();
 }
 
-// Called when the game starts or when spawned
-void ADRPlayerCharacter::BeginPlay()
+void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::BeginPlay();
-	
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	PlayerInputComponent->BindAxis("MoveForward", this, &ADRPlayerCharacter::MoveForward);
+	PlayerInputComponent->BindAxis("MoveRight", this, &ADRPlayerCharacter::MoveRight);
+	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
+	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ADRPlayerCharacter::PrimaryAction);
+	PlayerInputComponent->BindAction("SecondaryAction", IE_Pressed, this, &ADRPlayerCharacter::SecondaryAction);
+	PlayerInputComponent->BindAction("UltimateAction", IE_Pressed, this, &ADRPlayerCharacter::UltimateAction);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADRPlayerCharacter::PrimaryInteract);
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADRPlayerCharacter::StartSprint);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADRPlayerCharacter::StopSprint);
 }
 
+// Functions --------------------------------------
 void ADRPlayerCharacter::MoveForward(float Value)
 {
 	FRotator ControlRot = GetControlRotation();
@@ -90,61 +101,6 @@ void ADRPlayerCharacter::MoveRight(float Value)
 	AddMovementInput(RightVector, Value);
 }
 
-void ADRPlayerCharacter::StartSprint()
-{
-	ActionComponent->StartActionByName(this, "Sprint");
-}
-
-void ADRPlayerCharacter::StopSprint()
-{
-	ActionComponent->StopActionByName(this, "Sprint");
-}
-
-void ADRPlayerCharacter::PrimaryAttack()
-{	
-	PlayAnimMontage(AttackMontage);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ADRPlayerCharacter::PrimaryAttack_TimeElapsed, 0.2f);
-}
-
-void ADRPlayerCharacter::PrimaryAttack_TimeElapsed()
-{
-	SpawnProjectile(PrimaryAttackProjectileClass);
-}
-
-void ADRPlayerCharacter::UltAbility()
-{
-	PlayAnimMontage(AttackMontage);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_UltAbility, this, &ADRPlayerCharacter::UltAbility_TimeElapsed, 0.2f);
-}
-
-void ADRPlayerCharacter::UltAbility_TimeElapsed()
-{
-	SpawnProjectile(UltProjectileClass);
-}
-
-void ADRPlayerCharacter::DashAbility()
-{
-	PlayAnimMontage(AttackMontage);
-	
-	GetWorldTimerManager().SetTimer(TimerHandle_DashAbility, this, &ADRPlayerCharacter::DashAbility_TimeElapsed, 0.2f);
-}
-
-void ADRPlayerCharacter::DashAbility_TimeElapsed()
-{
-	SpawnProjectile(DashProjectileClass);
-}
-
-/*void ADRPlayerCharacter::Turn(float Value)
-{
-	
-}
-
-void ADRPlayerCharacter::LookUp(float Value)
-{
-}*/
-
 void ADRPlayerCharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
 	float NewHealth, float Delta)
 {	
@@ -165,33 +121,6 @@ void ADRPlayerCharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttr
 			SetLifeSpan(10.f);
 		}
 	}
-	
-}
-
-// Called every frame
-void ADRPlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-	PlayerInputComponent->BindAxis("MoveForward", this, &ADRPlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ADRPlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-
-	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ADRPlayerCharacter::PrimaryAttack);
-	PlayerInputComponent->BindAction("UltAbility", IE_Pressed, this, &ADRPlayerCharacter::UltAbility);
-	PlayerInputComponent->BindAction("DashAbility", IE_Pressed, this, &ADRPlayerCharacter::DashAbility);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADRPlayerCharacter::PrimaryInteract);
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADRPlayerCharacter::StartSprint);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADRPlayerCharacter::StopSprint);
 }
 
 void ADRPlayerCharacter::DR_HealSelf(float Amount /* = 100 */)
@@ -207,55 +136,28 @@ void ADRPlayerCharacter::PrimaryInteract()
 	}
 }
 
-FRotator ADRPlayerCharacter::CalculateAimRotation()
+// Actions
+void ADRPlayerCharacter::StartSprint()
 {
-	FRotator ReturnValue;
-
-	FCollisionShape Shape;
-	Shape.SetSphere(20.f);
-
-	// Ignore Player
-	FCollisionQueryParams QueryParams;
-	QueryParams.AddIgnoredActor(this);
-
-	FCollisionObjectQueryParams ObjectParams;
-	ObjectParams.AddObjectTypesToQuery(ECC_WorldDynamic);
-	ObjectParams.AddObjectTypesToQuery(ECC_WorldStatic);
-	ObjectParams.AddObjectTypesToQuery(ECC_Pawn);
-	
-	FVector TraceStart = UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0)->GetCameraLocation();
-	FVector TraceEnd = TraceStart + (GetControlRotation().Vector() * 5000.f);
-	
-	FHitResult Hit;
-
-	//DrawDebugLine(GetWorld(), TraceStart, TraceEnd, FColor::Green, false, 3.f);
-	
-	if(GetWorld()->SweepSingleByObjectType(Hit, TraceStart, TraceEnd, FQuat::Identity, ObjectParams, Shape, QueryParams))
-	{
-		TraceEnd = Hit.ImpactPoint;		
-	}
-
-	FVector SpawnLocation = AbilityArrowComponent->GetComponentLocation();
-
-	ReturnValue = FRotationMatrix::MakeFromX(TraceEnd - SpawnLocation).Rotator();
-
-	//DrawDebugLine(GetWorld(), SpawnLocation, TraceEnd, FColor::Red, false, 3.f);
-
-	return ReturnValue;
+	ActionComponent->StartActionByName(this, "Sprint");
 }
 
-void ADRPlayerCharacter::SpawnProjectile_Implementation(TSubclassOf<ADRProjectile> ProjectileClass)
+void ADRPlayerCharacter::StopSprint()
 {
-	if(ensureAlways(ProjectileClass))
-	{
-		FTransform SpawnTransform = FTransform(CalculateAimRotation(),AbilityArrowComponent->GetComponentLocation());
-
-		FActorSpawnParameters SpawnParams;
-		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		SpawnParams.Owner = this;
-		SpawnParams.Instigator = this;
-		
-		GetWorld()->SpawnActor<ADRProjectile>(ProjectileClass, SpawnTransform, SpawnParams);
-	}
+	ActionComponent->StopActionByName(this, "Sprint");
 }
 
+void ADRPlayerCharacter::PrimaryAction()
+{	
+	ActionComponent->StartActionByName(this, "PrimaryAction");
+}
+
+void ADRPlayerCharacter::SecondaryAction()
+{
+	ActionComponent->StartActionByName(this, "SecondaryAction");
+}
+
+void ADRPlayerCharacter::UltimateAction()
+{
+	ActionComponent->StartActionByName(this, "UltimateAction");
+}

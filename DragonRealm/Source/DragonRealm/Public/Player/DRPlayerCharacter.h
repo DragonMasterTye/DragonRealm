@@ -21,9 +21,15 @@ public:
 	// Ctor
 	ADRPlayerCharacter();
 
-protected:
 	// Unreal Functions
-	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	// Function
+	UFUNCTION(Exec)
+	void DR_HealSelf(float Amount = 100.f);
+
+protected:
 
 	// Physical(Scene) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -40,8 +46,7 @@ protected:
 	UDRAttributeComponent* AttributeComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UDRActionComponent* ActionComponent;
-    
-
+	
 	//  Properties
 	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> PrimaryAttackProjectileClass;
@@ -56,51 +61,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeOfHitParamName;
 
-	// Timers
-	FTimerHandle TimerHandle_PrimaryAttack;
-	FTimerHandle TimerHandle_UltAbility;
-	FTimerHandle TimerHandle_DashAbility;
-	
-	// Movement Functions
-	void MoveForward(float Value);
-	void MoveRight(float Value);
-	//void Turn(float Value);
-	//void LookUp(float Value);
-
-	// Actions
-	void StartSprint();
-	void StopSprint();
-	void PrimaryAttack();
-	void PrimaryAttack_TimeElapsed();
-	void UltAbility();
-	void UltAbility_TimeElapsed();
-	void DashAbility();
-	void DashAbility_TimeElapsed();
-
-	// Interaction
-	void PrimaryInteract();
-
-	// Utilities
-	FRotator CalculateAimRotation();
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Abilities")
-	void SpawnProjectile(TSubclassOf<ADRProjectile> ProjectileClass);
-
-	// Functions
-	UFUNCTION()
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta);
-
 	// Unreal Functions
 	virtual void PostInitializeComponents() override;
 	virtual FVector GetPawnViewLocation() const override;
 	
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	// Functions
+	void MoveForward(float Value);
+	void MoveRight(float Value);
+	void PrimaryInteract();
+	UFUNCTION()
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta);
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(Exec)
-	void DR_HealSelf(float Amount = 100.f);
-
+	// Actions
+	void StartSprint();
+	void StopSprint();
+	void PrimaryAction();
+	void SecondaryAction();
+	void UltimateAction();
 };

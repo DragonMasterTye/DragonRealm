@@ -20,3 +20,13 @@ void UDRAction::StopAction_Implementation(AActor* Instigator)
 		UE_LOG(LogTemp, Log, TEXT("Action: %s has STOPPED."), *GetNameSafe(this));
 	}
 }
+
+UWorld* UDRAction::GetWorld() const
+{
+	UActorComponent* Comp = Cast<UActorComponent>(GetOuter());
+	if(Comp)
+	{
+		return Comp->GetWorld();
+	}
+	return nullptr;
+}

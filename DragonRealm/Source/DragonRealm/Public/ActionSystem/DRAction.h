@@ -6,12 +6,16 @@
 #include "UObject/NoExportTypes.h"
 #include "DRAction.generated.h"
 
+class UWorld;
 UCLASS(Blueprintable)
 class DRAGONREALM_API UDRAction : public UObject
 {
 	GENERATED_BODY()
 
 public:
+
+	// Unreal Functions
+	virtual UWorld* GetWorld() const override;
 
 	// Properties
 	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
