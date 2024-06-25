@@ -13,6 +13,14 @@ UCLASS()
 class DRAGONREALM_API UDRAction_SpawnProjectile : public UDRAction
 {
 	GENERATED_BODY()
+
+public:
+
+	// Ctor
+	UDRAction_SpawnProjectile();
+
+	// Functions
+	virtual void StartAction_Implementation(AActor* Instigator) override;
 	
 protected:
 
@@ -23,7 +31,7 @@ protected:
 	UParticleSystem* SpawnVFX;
 	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	USoundBase* SpawnSFX;
-	UPROPERTY(EditAnywhere, Category="DR|Projectile")
-	FVector SpawnLocation;
+	UPROPERTY(VisibleAnywhere, Category="DR|Projectile")
+	FName SpawnSocketName;
 	
 };
