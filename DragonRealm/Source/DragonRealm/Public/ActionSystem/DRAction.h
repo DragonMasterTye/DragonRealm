@@ -25,9 +25,13 @@ public:
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
-	void StartAction(AActor* Instigator); // Since this is a UObject, we don't already have an Instigator so this is a safe name
+	bool CanStart(AActor* Instigator); // Since this is a UObject, we don't already have an Instigator so this is a safe name
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
+	void StartAction(AActor* Instigator); 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "DR|Actions")
 	void StopAction(AActor* Instigator);
+	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
+	bool IsRunning() const;
 
 protected:
 
@@ -36,6 +40,7 @@ protected:
 	FGameplayTagContainer GrantsTags;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
 	FGameplayTagContainer BlockedByTags;
+	bool bIsRunning;
 
 	// Functions
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")

@@ -5,6 +5,7 @@
 
 #include "AIController.h"
 #include "BrainComponent.h"
+#include "ActionSystem/DRActionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "World/DRWorldUserWidget.h"
 #include "BehaviorTree/BlackboardComponent.h"
@@ -13,7 +14,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
-// Sets default values
+// Ctor
 ADRAICharacter::ADRAICharacter()
 {
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
@@ -22,6 +23,7 @@ ADRAICharacter::ADRAICharacter()
 	
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
+	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
 
 	TimeOfHitParamName = "DR_TimeOfHit";
 

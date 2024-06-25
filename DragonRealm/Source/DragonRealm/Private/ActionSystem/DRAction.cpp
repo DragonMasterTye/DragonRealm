@@ -19,6 +19,21 @@ UWorld* UDRAction::GetWorld() const
 }
 
 // Functions --------------------------------------------------
+bool UDRAction::CanStart_Implementation(AActor* Instigator)
+{
+	if(IsRunning())
+	{
+		return false;
+	}
+	
+	UDRActionComponent* ActionComponent = GetOwningComponent();
+	if(ActionComponent->ActiveGameplayTags.HasAny(BlockedByTags))
+	{
+		return false;
+	}
+	return true;
+}
+
 void UDRAction::StartAction_Implementation(AActor* Instigator)
 {
 	if(CVarDebugAction.GetValueOnGameThread())
@@ -28,10 +43,14 @@ void UDRAction::StartAction_Implementation(AActor* Instigator)
 
 	UDRActionComponent* ActionComponent = GetOwningComponent();
 	ActionComponent->ActiveGameplayTags.AppendTags(GrantsTags);
+
+	bIsRunning = true;
 }
 
 void UDRAction::StopAction_Implementation(AActor* Instigator)
 {
+	ensureAlways(bIsRunning);
+	
 	if(CVarDebugAction.GetValueOnGameThread())
 	{
 		UE_LOG(LogTemp, Log, TEXT("Action: %s has STOPPED."), *GetNameSafe(this));
@@ -39,9 +58,16 @@ void UDRAction::StopAction_Implementation(AActor* Instigator)
 
 	UDRActionComponent* ActionComponent = GetOwningComponent();
 	ActionComponent->ActiveGameplayTags.RemoveTags(GrantsTags);
+
+	bIsRunning = false;
+}
+
+bool UDRAction::IsRunning_Implementation() const
+{
+	return bIsRunning;
 }
 
 UDRActionComponent* UDRAction::GetOwningComponent() const
 {
-	return Cast<UDRActionComponent>(GetWorld());
+	return Cast<UDRActionComponent>(GetOuter());
 }

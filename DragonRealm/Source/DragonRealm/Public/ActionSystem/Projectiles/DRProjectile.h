@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
 #include "DRProjectile.generated.h"
 
@@ -14,31 +15,36 @@ class DRAGONREALM_API ADRProjectile : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	// Ctor
 	ADRProjectile();
 
+	// Unreal Functions
 	virtual void BeginPlay() override;
 
 protected:
 	// Unreal functions
 	virtual void PostInitializeComponents() override;
 	
-	// Physical Components
+	// Physical(Scene) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	USphereComponent* SphereComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UParticleSystemComponent* ParticleSystemComponent;
 
-	// Imaginary Components
+	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UProjectileMovementComponent* ProjectileMovementComponent;
 
+	// Properties
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Projectile")
+	FGameplayTag ParryTag;
+	
 	// Effects
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Effects")
 	UParticleSystem* SpawnVFX;
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Effects")
 	UParticleSystem* ImpactVFX;
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Effects")
 	USoundBase* ImpactSFX;
 
 	// Functions

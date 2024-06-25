@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DRAICharacter.generated.h"
 
+class UDRActionComponent;
 class UDRWorldUserWidget;
 class UDRAttributeComponent;
 class UPawnSensingComponent;
@@ -16,7 +17,7 @@ class DRAGONREALM_API ADRAICharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this character's properties
+	// Ctor
 	ADRAICharacter();
 
 	// Functions
@@ -25,18 +26,19 @@ public:
 
 protected:
 
-	// Imaginary Components
+	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComponent;
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UDRAttributeComponent* AttributeComponent;
+	UPROPERTY(VisibleAnywhere, Category = "Components")
+	UDRActionComponent* ActionComponent;
 
 	// Properties
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
 	FName TimeOfHitParamName;
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
-	// UPROPERTY()
 	UDRWorldUserWidget* ActiveHealthBar;
 
 	// Unreal Functions

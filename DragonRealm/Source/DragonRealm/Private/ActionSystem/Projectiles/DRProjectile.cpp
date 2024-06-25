@@ -2,6 +2,8 @@
 
 
 #include "ActionSystem/Projectiles/DRProjectile.h"
+
+#include "ActionSystem/DRActionComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -60,6 +62,14 @@ void ADRProjectile::OnActorOverlap_Implementation(UPrimitiveComponent* Overlappe
 {
 	if(OtherActor && OtherActor != GetInstigator())
 	{
+		UDRActionComponent* ActionComponent = Cast<UDRActionComponent>(OtherActor->GetComponentByClass(UDRActionComponent::StaticClass()));
+		if(ActionComponent && ActionComponent->ActiveGameplayTags.HasTag(ParryTag))
+		{
+			ProjectileMovementComponent->Velocity = -ProjectileMovementComponent->Velocity;
+			SetInstigator(Cast<APawn>(OtherActor));
+			return;
+		}
+		
 		Explode();
 	}
 }
