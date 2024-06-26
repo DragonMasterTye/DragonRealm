@@ -50,7 +50,6 @@ void ADRProjectile::Explode_Implementation()
 	if(ensure(!IsPendingKillPending()))
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ImpactVFX, GetActorLocation(), GetActorRotation());
-
 		UGameplayStatics::PlaySoundAtLocation(this, ImpactSFX, GetActorLocation(), GetActorRotation());
 
 		Destroy();

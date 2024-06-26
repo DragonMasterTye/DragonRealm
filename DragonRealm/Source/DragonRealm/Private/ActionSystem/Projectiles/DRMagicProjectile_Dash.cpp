@@ -15,7 +15,7 @@ ADRMagicProjectile_Dash::ADRMagicProjectile_Dash()
 void ADRMagicProjectile_Dash::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	GetWorldTimerManager().SetTimer(TimerHandle_DelayedDetonate, this, &ADRMagicProjectile_Dash::Explode, DetonateDelay);
 }
 
@@ -41,4 +41,5 @@ void ADRMagicProjectile_Dash::TeleportInstigator()
 	{
 		ActorToTeleport->TeleportTo(GetActorLocation(), ActorToTeleport->GetActorRotation(), false, false);
 	}
+	Destroy();
 }

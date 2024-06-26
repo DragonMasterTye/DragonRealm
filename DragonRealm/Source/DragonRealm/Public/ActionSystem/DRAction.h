@@ -22,6 +22,8 @@ public:
 	// Properties
 	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
 	FName ActionName;
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
+	bool bAutoStart;
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")

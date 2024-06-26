@@ -3,44 +3,57 @@
 
 #include "Core/DRInteractionComponent.h"
 #include "Core/DRGameplayInterface.h"
+#include "World/DRWorldUserWidget.h"
 #include "DrawDebugHelpers.h"
+#include "Blueprint/UserWidget.h"
 
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("DR.DebugDrawInteraction"), false, TEXT("Enable Debug lines for InteractionComponent"), ECVF_Cheat);
 
-// Sets default values for this component's properties
+// Ctor
 UDRInteractionComponent::UDRInteractionComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	// ...
+	TraceRadius = 30.f;
+	TraceDistance = 500.f;
+	TraceChannel = ECC_WorldDynamic;
 }
 
-// Called when the game starts
-void UDRInteractionComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-	
-}
-
-
-// Called every frame
+// Unreal Functions
 void UDRInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	// ...
+	FindBestInteractable();
 }
 
+void UDRInteractionComponent::BeginPlay()
+{
+	Super::BeginPlay();
+
+	
+}
+
+// Functions
 void UDRInteractionComponent::PrimaryInteract()
+{
+	if(FocusedActor == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "No FocusedActor to Interact with");
+		return;
+	}
+	
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+			
+	IDRGameplayInterface::Execute_Interact(FocusedActor, OwnerPawn);
+}
+
+void UDRInteractionComponent::FindBestInteractable()
 {
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
 	
 	FCollisionObjectQueryParams ObjectQueryParams;
-	ObjectQueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+	ObjectQueryParams.AddObjectTypesToQuery(TraceChannel);
 
 	AActor* Owner = GetOwner();
 
@@ -48,17 +61,17 @@ void UDRInteractionComponent::PrimaryInteract()
 	FRotator EyeRotation;
 	Owner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-	FVector End = EyeLocation + (EyeRotation.Vector() * 1000.0f);
+	FVector End = EyeLocation + (EyeRotation.Vector() * TraceDistance);
 	
 	//FHitResult Hit;
 	//bool bBlockingHit = GetWorld()->LineTraceSingleByObjectType(Hit, EyeLocation, End, ObjectQueryParams);
 
+	FocusedActor = nullptr;
+	
 	TArray<FHitResult> Hits;
 
-	float Radius = 30.0f;
-
 	FCollisionShape Shape;
-	Shape.SetSphere(Radius);
+	Shape.SetSphere(TraceRadius);
 	
 	bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, EyeLocation, End, FQuat::Identity, ObjectQueryParams, Shape);
 	FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red;
@@ -67,7 +80,7 @@ void UDRInteractionComponent::PrimaryInteract()
 	{
 		if(bDebugDraw)
 		{
-			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, Radius, 16, LineColor, false, 2.0f);
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 16, LineColor, false, 2.0f);
 		}
 		
 		AActor* HitActor = Hit.GetActor();
@@ -75,11 +88,34 @@ void UDRInteractionComponent::PrimaryInteract()
 		{
 			if(HitActor->Implements<UDRGameplayInterface>())
 			{
-				APawn* OwnerPawn = Cast<APawn>(Owner);
-			
-				IDRGameplayInterface::Execute_Interact(HitActor, OwnerPawn);
+				FocusedActor = HitActor;
 				break;
 			}
+		}
+	}
+
+	if(FocusedActor)
+	{
+		if(DefaultInteractionWidget == nullptr && ensure(DefaultInteractionWidgetClass))
+		{
+			DefaultInteractionWidget = CreateWidget<UDRWorldUserWidget>(GetWorld(), DefaultInteractionWidgetClass);
+		}
+
+		if(DefaultInteractionWidget)
+		{
+			DefaultInteractionWidget->AttachedActor = FocusedActor;
+
+			if(!DefaultInteractionWidget->IsInViewport())
+			{
+				DefaultInteractionWidget->AddToViewport();
+			}
+		}
+	}
+	else
+	{
+		if(DefaultInteractionWidget)
+		{
+			DefaultInteractionWidget->RemoveFromParent();
 		}
 	}
 	
