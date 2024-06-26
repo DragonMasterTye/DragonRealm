@@ -39,9 +39,9 @@ void ADRAICharacter::PostInitializeComponents()
 }
 
 void ADRAICharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
-	float NewHealth, float Delta)
+	float NewHealth, float Delta, float ActualDelta)
 {
-	if(Delta < 0.f)
+	if(ActualDelta < 0.f)
 	{
 		// Turn on MF_DR_HitFlash
 		GetMesh()->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);

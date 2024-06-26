@@ -25,7 +25,7 @@ void UDRWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 	AttachedActor->GetActorBounds(true, Origin, BoxExtent, true);
 	Origin.Z += BoxExtent.Z;
 	FVector WorldPosition = Origin; 
-	if(UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), WorldPosition + PositionOffset, ScreenPosition))
+	if(UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), WorldPosition + WorlPositionOffset, ScreenPosition))
 	{
 		float Scale = UWidgetLayoutLibrary::GetViewportScale(this);
 		ScreenPosition /= Scale;

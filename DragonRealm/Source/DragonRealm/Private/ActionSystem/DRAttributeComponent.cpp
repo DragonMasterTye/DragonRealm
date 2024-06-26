@@ -73,7 +73,7 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	float OldHealth = CurrentHealth;
 	CurrentHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
 	float ActualDelta = CurrentHealth - OldHealth;
-	OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, ActualDelta);
+	OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, Delta, ActualDelta);
 
 	// Died
 	if(ActualDelta < 0.f && CurrentHealth <= 0.f)

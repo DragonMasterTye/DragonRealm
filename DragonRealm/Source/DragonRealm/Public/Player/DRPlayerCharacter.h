@@ -70,7 +70,7 @@ protected:
 	void MoveRight(float Value);
 	void PrimaryInteract();
 	UFUNCTION()
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta);
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta, float ActualDelta);
 
 	// Actions
 	void StartSprint();

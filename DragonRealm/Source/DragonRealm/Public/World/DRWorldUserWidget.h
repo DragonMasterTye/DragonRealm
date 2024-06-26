@@ -28,8 +28,8 @@ protected:
 	USizeBox* ParentSizeBox;
 
 	// Properties
-	UPROPERTY(EditAnywhere, Category = "UI")
-	FVector PositionOffset;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	FVector WorlPositionOffset;
 
 	// Unreal Functions
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;

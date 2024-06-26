@@ -25,7 +25,7 @@ void ADRTargetDummy::PostInitializeComponents()
 }
 
 void ADRTargetDummy::OnCurrentHealthChanged_Implementation(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth,
-                                             float Delta)
+                                             float Delta, float ActualDelta)
 {
 	if(ensureAlways(Mesh))
 	{

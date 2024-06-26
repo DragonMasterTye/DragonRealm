@@ -7,7 +7,7 @@
 #include "DRAttributeComponent.generated.h"
 
 class UDRAttributeComponent; // Forward declare to make the DELEGATE shut up
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FOnCurrentHealthChanged, AActor*, Instigator, UDRAttributeComponent*, OwningComponent, float, NewHealth, float, Delta);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnCurrentHealthChanged, AActor*, Instigator, UDRAttributeComponent*, OwningComponent, float, NewHealth, float, Delta, float, ActualDelta);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRAGONREALM_API UDRAttributeComponent : public UActorComponent
