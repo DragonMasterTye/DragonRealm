@@ -16,6 +16,7 @@ class DRAGONREALM_API UDRAttributeComponent : public UActorComponent
 
 public:
 
+	// Ctor
 	UDRAttributeComponent();
 	
 	// Functions
@@ -33,12 +34,15 @@ public:
 	bool Kill(AActor* InstigatorActor);
 
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
+	// Properties
+	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Attributes")
 	float CurrentHealth;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Attributes")
-	float MaxHealth = 100.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
+	float MaxHealth;
+
+	// Replication
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastCurrentHealthChanged(AActor* Instigator, float NewHealth, float Delta, float ActualDelta);
 	
 };

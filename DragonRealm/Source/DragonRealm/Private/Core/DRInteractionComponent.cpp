@@ -24,28 +24,22 @@ void UDRInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	FindBestInteractable();
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+	if(OwnerPawn->IsLocallyControlled())
+	{
+		FindBestInteractable();
+	}
 }
 
 void UDRInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	
 }
 
 // Functions
 void UDRInteractionComponent::PrimaryInteract()
 {
-	if(FocusedActor == nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "No FocusedActor to Interact with");
-		return;
-	}
-	
-	APawn* OwnerPawn = Cast<APawn>(GetOwner());
-			
-	IDRGameplayInterface::Execute_Interact(FocusedActor, OwnerPawn);
+	ServerInteract(FocusedActor);
 }
 
 void UDRInteractionComponent::FindBestInteractable()
@@ -80,7 +74,7 @@ void UDRInteractionComponent::FindBestInteractable()
 	{
 		if(bDebugDraw)
 		{
-			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 16, LineColor, false, 2.0f);
+			DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 16, LineColor, false, 0.f);
 		}
 		
 		AActor* HitActor = Hit.GetActor();
@@ -121,6 +115,19 @@ void UDRInteractionComponent::FindBestInteractable()
 	
 	if(bDebugDraw)
 	{
-		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 2.0f, 0, 2.0f);
+		DrawDebugLine(GetWorld(), EyeLocation, End, LineColor, false, 0.f, 0, 2.0f);
 	}
+}
+
+void UDRInteractionComponent::ServerInteract_Implementation(AActor* InFocusedActor)
+{
+	if(InFocusedActor == nullptr)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Red, "No FocusedActor to Interact with");
+		return;
+	}
+	
+	APawn* OwnerPawn = Cast<APawn>(GetOwner());
+			
+	IDRGameplayInterface::Execute_Interact(InFocusedActor, OwnerPawn);
 }

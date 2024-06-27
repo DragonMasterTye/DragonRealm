@@ -44,5 +44,9 @@ protected:
 
 	// Functions
 	void FindBestInteractable();
+
+	// Replication Functions
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(AActor* InFocusedActor);
 			
 };

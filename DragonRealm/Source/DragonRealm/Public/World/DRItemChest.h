@@ -13,25 +13,28 @@ class DRAGONREALM_API ADRItemChest : public AActor, public IDRGameplayInterface
 	GENERATED_BODY()
 
 public:	
-	// Sets default values for this actor's properties
+	// Ctor
 	ADRItemChest();
-	
+
+	// Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float TargetPitch;
-	
+
+	// Functions
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
+	
+	// Physical(Scene) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* BaseMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* LidMesh;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	// Replication
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly) // RepNotify
+	bool bLidOpened;
+	UFUNCTION(BlueprintNativeEvent)
+	void OnRep_LidOpened();
+	
 };

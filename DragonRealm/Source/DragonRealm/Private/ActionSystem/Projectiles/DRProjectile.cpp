@@ -13,7 +13,9 @@ static TAutoConsoleVariable<bool> CVarDebugProjectile(TEXT("DR.DebugProjectile")
 
 // Sets default values
 ADRProjectile::ADRProjectile()
-{	
+{
+	//bReplicates = true;
+	
 	// Components
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComponent->SetEnableGravity(false);

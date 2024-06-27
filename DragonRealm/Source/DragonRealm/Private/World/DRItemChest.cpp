@@ -3,11 +3,13 @@
 
 #include "World/DRItemChest.h"
 
-// Sets default values
+#include "Net/UnrealNetwork.h"
+
+// Ctor
 ADRItemChest::ADRItemChest()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
 	RootComponent = BaseMesh;
@@ -18,21 +20,22 @@ ADRItemChest::ADRItemChest()
 	TargetPitch = 110.0f;
 }
 
-// Called when the game starts or when spawned
-void ADRItemChest::BeginPlay()
+// Functions------------------------------------------
+void ADRItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	Super::BeginPlay();
+	bLidOpened = true;
+	OnRep_LidOpened();
+}
+
+void ADRItemChest::OnRep_LidOpened_Implementation()
+{
 	
 }
 
-// Called every frame
-void ADRItemChest::Tick(float DeltaTime)
+// Replication
+void ADRItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Super::Tick(DeltaTime);
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-}
-
-void ADRItemChest::Interact_Implementation(APawn* InstigatorPawn)
-{
-	LidMesh->SetRelativeRotation(FRotator(110, 0, 0));
+	DOREPLIFETIME(ADRItemChest, bLidOpened);
 }

@@ -5,15 +5,20 @@
 
 #include "Core/DRGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 
 static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("DR.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for AttributeComponent"), ECVF_Cheat);
 
-// Sets default values for this component's properties
+// Ctor
 UDRAttributeComponent::UDRAttributeComponent()
 {
+	SetIsReplicatedByDefault(true);
+	
+	MaxHealth = 100.f;
 	CurrentHealth = MaxHealth;
 }
 
+// Functions-----------------------------------------------------
 UDRAttributeComponent* UDRAttributeComponent::GetAttributes(AActor* FromActor)
 {
 	if(FromActor)
@@ -53,11 +58,6 @@ bool UDRAttributeComponent::Kill(AActor* InstigatorActor)
 	return ApplyHealthChange(InstigatorActor, -MaxHealth);
 }
 
-void UDRAttributeComponent::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
 {
 	if(!GetOwner()->CanBeDamaged() && Delta < 0.f)
@@ -73,7 +73,11 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	float OldHealth = CurrentHealth;
 	CurrentHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
 	float ActualDelta = CurrentHealth - OldHealth;
-	OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, Delta, ActualDelta);
+	if(ActualDelta != 0.f)
+	{
+		MulticastCurrentHealthChanged(InstigatorActor, CurrentHealth, Delta, ActualDelta);
+		//OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, Delta, ActualDelta);
+	}
 
 	// Died
 	if(ActualDelta < 0.f && CurrentHealth <= 0.f)
@@ -88,3 +92,17 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	return ActualDelta != 0;
 }
 
+// Replication
+void UDRAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UDRAttributeComponent, CurrentHealth);
+	DOREPLIFETIME(UDRAttributeComponent, MaxHealth);
+}
+
+void UDRAttributeComponent::MulticastCurrentHealthChanged_Implementation(AActor* Instigator, float NewHealth,
+	float Delta, float ActualDelta)
+{
+	OnCurrentHealthChanged.Broadcast(Instigator, this, NewHealth, Delta, ActualDelta);
+}

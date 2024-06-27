@@ -8,6 +8,8 @@
 // Sets default values
 ADRPickupActor::ADRPickupActor()
 {
+	bReplicates = true;
+	
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("Collision");
 	SphereComponent->SetCollisionProfileName("Pickup");
 	RootComponent = SphereComponent;
