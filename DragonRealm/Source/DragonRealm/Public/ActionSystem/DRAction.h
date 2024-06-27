@@ -7,6 +7,19 @@
 #include "UObject/NoExportTypes.h"
 #include "DRAction.generated.h"
 
+USTRUCT()
+struct FActionRepData
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	bool bIsRunning;
+	UPROPERTY()
+	AActor* Instigator;
+};
+
 class UDRActionComponent;
 class UWorld;
 UCLASS(Blueprintable)
@@ -15,6 +28,9 @@ class DRAGONREALM_API UDRAction : public UObject
 	GENERATED_BODY()
 
 public:
+
+	// Init
+	void Initialize(UDRActionComponent* NewActionComponent);
 
 	// Unreal Functions
 	virtual UWorld* GetWorld() const override;
@@ -35,17 +51,27 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
 	bool IsRunning() const;
 
+	// Replication
+	virtual bool IsSupportedForNetworking() const override { return true; }
+	
 protected:
 
 	// Properties
+	UPROPERTY(Replicated)
+	UDRActionComponent* OwningActionComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
 	FGameplayTagContainer GrantsTags;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
-	FGameplayTagContainer BlockedByTags;
-	bool bIsRunning;
+	FGameplayTagContainer BlockedByTags;	
 
 	// Functions
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
 	UDRActionComponent* GetOwningComponent() const;
+
+	// Replication
+	UPROPERTY(ReplicatedUsing="OnRep_RepData")
+	FActionRepData RepData; // OnRep function will ONLY trigger if this value CHANGES (must keep track of state on both Client and Server)
+	UFUNCTION()
+	void OnRep_RepData();
 	
 };

@@ -4,6 +4,9 @@
 #include "ActionSystem/DRActionComponent.h"
 
 #include "ActionSystem/DRAction.h"
+#include "DragonRealm/DragonRealm.h"
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 
 static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), true, TEXT("Enable Debug messages and logs for Tags"), ECVF_Cheat);
 
@@ -19,9 +22,12 @@ void UDRActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	for(TSubclassOf<UDRAction> ActionClass : DefaultActions)
+	if(GetOwner()->HasAuthority())
 	{
-		AddAction(GetOwner(), ActionClass);
+		for(TSubclassOf<UDRAction> ActionClass : DefaultActions)
+		{
+			AddAction(GetOwner(), ActionClass);
+		}
 	}
 }
 
@@ -32,8 +38,18 @@ void UDRActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 	if(CVarDebugTags.GetValueOnGameThread())
 	{
-		FString DebugMessage = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-		GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
+		//FString DebugMessage = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+		//GEngine->AddOnScreenDebugMessage(-1, 0.0f, FColor::White, DebugMessage);
+
+		// Draw all Actions
+		for(UDRAction* Action : Actions)
+		{
+			FColor TextColor = Action->IsRunning() ? FColor::Blue : FColor::White;
+			FString ActionMsg =  FString::Printf(TEXT("[%s] Action: %s"),
+				*GetNameSafe(GetOwner()),
+				*GetNameSafe(Action));
+			DRLogOnScreen(this, ActionMsg, TextColor, 0.0f);
+		}
 	}
 }
 
@@ -45,9 +61,16 @@ void UDRActionComponent::AddAction(AActor* Instigator, TSubclassOf<UDRAction> Ac
 		return;
 	}
 
-	UDRAction* NewAction = NewObject<UDRAction>(this, ActionClass);
+	if(!GetOwner()->HasAuthority())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client attempting to AddAction. [Class: %s]"), *GetNameSafe(ActionClass));
+		return;
+	}
+
+	UDRAction* NewAction = NewObject<UDRAction>(GetOwner(), ActionClass);
 	if(ensure(NewAction))
 	{
+		NewAction->Initialize(this);
 		Actions.Add(NewAction);
 
 		if(NewAction->bAutoStart && ensure(NewAction->CanStart(Instigator)))
@@ -75,7 +98,7 @@ bool UDRActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 		{
 			if(!Action->CanStart(Instigator))
 			{
-				if(CVarDebugTags.GetValueOnGameThread())
+				if(GetOwner()->HasAuthority() && CVarDebugTags.GetValueOnGameThread())
 				{
 					FString FailedMsg = FString::Printf(TEXT("Failed to run: %s"), *ActionName.ToString());
 					GEngine->AddOnScreenDebugMessage(-1, 2.0f, FColor::Red, FailedMsg);
@@ -101,6 +124,11 @@ bool UDRActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	{
 		if(Action && Action->ActionName == ActionName && Action->IsRunning())
 		{
+			if(!GetOwner()->HasAuthority())
+			{
+				ServerStopAction(Instigator, ActionName);
+			}
+			
 			Action->StopAction(Instigator);
 			return true;
 		}
@@ -112,4 +140,30 @@ bool UDRActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 void UDRActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
 {
 	StartActionByName(Instigator, ActionName);
+}
+
+void UDRActionComponent::ServerStopAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StopActionByName(Instigator, ActionName);
+}
+
+
+bool UDRActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool WroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	for(UDRAction* Action : Actions)
+	{
+		if(Action)
+		{
+			WroteSomething |= Channel->ReplicateSubobject(Action, *Bunch, *RepFlags);
+		}
+	}
+	return WroteSomething;
+}
+
+void UDRActionComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(UDRActionComponent, Actions);
 }

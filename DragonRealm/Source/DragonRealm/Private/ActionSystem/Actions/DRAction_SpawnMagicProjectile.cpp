@@ -70,9 +70,12 @@ void UDRAction_SpawnMagicProjectile::StartAction_Implementation(AActor* Instigat
 		UGameplayStatics::SpawnEmitterAttached(SpawnVFX, Character->GetMesh(), SpawnSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 		UGameplayStatics::SpawnSoundAttached(SpawnSFX, Character->GetMesh(), SpawnSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget);
 
-		FTimerHandle TimerHandle_SpawnDelay;
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "SpawnDelay_TimeElapsed", Character);
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnDelay, Delegate, SpawnAnimDelay, false);
+		if(Character->HasAuthority())
+		{
+			FTimerHandle TimerHandle_SpawnDelay;
+			FTimerDelegate Delegate;
+			Delegate.BindUFunction(this, "SpawnDelay_TimeElapsed", Character);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle_SpawnDelay, Delegate, SpawnAnimDelay, false);
+		}
 	}
 }

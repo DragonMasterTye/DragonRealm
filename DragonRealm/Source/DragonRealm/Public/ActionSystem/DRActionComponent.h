@@ -32,10 +32,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
 	bool StopActionByName(AActor* Instigator, FName ActionName);
 
+	// Replication
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+
 protected:
 	
 	// Properties
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	TArray<UDRAction*> Actions;
 	UPROPERTY(EditAnywhere, Category = "DR|Actions")
 	TArray<TSubclassOf<UDRAction>> DefaultActions;
@@ -47,4 +50,7 @@ protected:
 	// Replication
 	UFUNCTION(Server, Reliable)
 	void ServerStartAction(AActor* Instigator, FName ActionName);
+	UFUNCTION(Server, Reliable)
+	void ServerStopAction(AActor* Instigator, FName ActionName);
+	
 };

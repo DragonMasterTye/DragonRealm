@@ -71,21 +71,22 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 	}
 	
 	float OldHealth = CurrentHealth;
-	CurrentHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
-	float ActualDelta = CurrentHealth - OldHealth;
-	if(ActualDelta != 0.f)
-	{
-		MulticastCurrentHealthChanged(InstigatorActor, CurrentHealth, Delta, ActualDelta);
-		//OnCurrentHealthChanged.Broadcast(InstigatorActor, this, CurrentHealth, Delta, ActualDelta);
-	}
+	float NewHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
+	float ActualDelta = NewHealth - OldHealth;
 
-	// Died
-	if(ActualDelta < 0.f && CurrentHealth <= 0.f)
+	if(GetOwner()->HasAuthority() && ActualDelta != 0.f)
 	{
-		ADRGameModeBase* GM = GetWorld()->GetAuthGameMode<ADRGameModeBase>();
-		if(GM)
+		CurrentHealth = NewHealth;
+		MulticastCurrentHealthChanged(InstigatorActor, CurrentHealth, Delta, ActualDelta);
+		
+		// Check if Killed
+		if(ActualDelta < 0.f && CurrentHealth <= 0.f)
 		{
-			GM->OnActorKilled(GetOwner(), InstigatorActor);
+			ADRGameModeBase* GM = GetWorld()->GetAuthGameMode<ADRGameModeBase>();
+			if(GM)
+			{
+				GM->OnActorKilled(GetOwner(), InstigatorActor);
+			}
 		}
 	}
 	
@@ -93,16 +94,16 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 }
 
 // Replication
+void UDRAttributeComponent::MulticastCurrentHealthChanged_Implementation(AActor* Instigator, float NewHealth,
+	float Delta, float ActualDelta)
+{
+	OnCurrentHealthChanged.Broadcast(Instigator, this, NewHealth, Delta, ActualDelta);
+}
+
 void UDRAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(UDRAttributeComponent, CurrentHealth);
 	DOREPLIFETIME(UDRAttributeComponent, MaxHealth);
-}
-
-void UDRAttributeComponent::MulticastCurrentHealthChanged_Implementation(AActor* Instigator, float NewHealth,
-	float Delta, float ActualDelta)
-{
-	OnCurrentHealthChanged.Broadcast(Instigator, this, NewHealth, Delta, ActualDelta);
 }

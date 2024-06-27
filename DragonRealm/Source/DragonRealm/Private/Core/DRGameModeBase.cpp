@@ -11,7 +11,7 @@
 #include "ActionSystem/DRAttributeComponent.h"
 #include "Player/DRPlayerCharacter.h"
 
-static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("DR.SpawnBots"), true, TEXT("Enable Spawning of bots via timer"), ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("DR.SpawnBots"), false, TEXT("Enable Spawning of bots via timer"), ECVF_Cheat);
 
 ADRGameModeBase::ADRGameModeBase()
 {
