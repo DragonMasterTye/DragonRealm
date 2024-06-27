@@ -11,6 +11,7 @@ static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), true, TEXT
 UDRActionComponent::UDRActionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 // Unreal Functions
@@ -81,6 +82,12 @@ bool UDRActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 				}
 				continue;
 			}
+
+			if(!GetOwner()->HasAuthority())
+			{
+				ServerStartAction(Instigator, ActionName);
+			}
+			
 			Action->StartAction(Instigator);
 			return true;
 		}
@@ -101,3 +108,8 @@ bool UDRActionComponent::StopActionByName(AActor* Instigator, FName ActionName)
 	return false;
 }
 
+// Replication
+void UDRActionComponent::ServerStartAction_Implementation(AActor* Instigator, FName ActionName)
+{
+	StartActionByName(Instigator, ActionName);
+}

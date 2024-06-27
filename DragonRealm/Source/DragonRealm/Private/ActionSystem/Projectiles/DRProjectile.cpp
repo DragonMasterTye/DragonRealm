@@ -14,7 +14,7 @@ static TAutoConsoleVariable<bool> CVarDebugProjectile(TEXT("DR.DebugProjectile")
 // Sets default values
 ADRProjectile::ADRProjectile()
 {
-	//bReplicates = true;
+	bReplicates = true;
 	
 	// Components
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
