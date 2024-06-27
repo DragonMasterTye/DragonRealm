@@ -37,7 +37,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCameraComponent* CameraComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UArrowComponent* AbilityArrowComponent;
+	UArrowComponent* SpawnTransformArrow;
 	
 	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")

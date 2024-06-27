@@ -13,6 +13,8 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "Player/DRPlayerCharacter.h"
+#include "Player/DRPlayerState.h"
 
 // Ctor
 ADRAICharacter::ADRAICharacter()
@@ -26,6 +28,9 @@ ADRAICharacter::ADRAICharacter()
 	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
 
 	TimeOfHitParamName = "DR_TimeOfHit";
+	MaxEXP = 50;
+	MinEXP = 10;
+	EXPToGrant = FMath::RandRange(MinEXP, MaxEXP);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	
@@ -64,6 +69,16 @@ void ADRAICharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttribut
 		// Died
 		if(NewHealth <= 0.0f)
 		{
+			ADRPlayerCharacter* PlayerCharacter = Cast<ADRPlayerCharacter>(InstigatorActor);
+			if(PlayerCharacter)
+			{
+				ADRPlayerState* PS = Cast<ADRPlayerState>(PlayerCharacter->GetPlayerState());
+				if(PS)
+				{
+					PS->AddExp(EXPToGrant);
+				}
+			}
+			
 			// Stop BT
 			AAIController* AIC = Cast<AAIController>(GetController());
 			if(AIC)

@@ -35,11 +35,17 @@ protected:
 	UDRActionComponent* ActionComponent;
 
 	// Properties
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	UPROPERTY(VisibleAnywhere, Category = "DR|Effects")
 	FName TimeOfHitParamName;
-	UPROPERTY(EditDefaultsOnly, Category = "UI")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|UI")
 	TSubclassOf<UUserWidget> HealthBarWidgetClass;
 	UDRWorldUserWidget* ActiveHealthBar;
+	UPROPERTY()
+	int32 EXPToGrant;
+	UPROPERTY(EditAnywhere, Category = "DR|EXP")
+	int32 MaxEXP;
+	UPROPERTY(EditAnywhere, Category = "DR|EXP")
+	int32 MinEXP;
 
 	// Unreal Functions
 	virtual void PostInitializeComponents() override;

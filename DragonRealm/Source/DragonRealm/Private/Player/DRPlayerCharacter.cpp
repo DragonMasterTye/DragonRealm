@@ -18,7 +18,8 @@
 ADRPlayerCharacter::ADRPlayerCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones; //@TODO update this to only tick when needed
+	
 	// Physical(Scene) Components
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
@@ -30,6 +31,9 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	SpawnTransformArrow = CreateDefaultSubobject<UArrowComponent>("SpawnTransformArrow");
+	SpawnTransformArrow->SetupAttachment(GetMesh(), AbilitySpawnSocket);
 
 	// Imaginary(Actor) Components
 	InteractionComponent = CreateDefaultSubobject<UDRInteractionComponent>("InteractionComponent");
@@ -118,7 +122,7 @@ void ADRPlayerCharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttr
 			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			GetCharacterMovement()->DisableMovement();
 
-			SetLifeSpan(10.f);
+			SetLifeSpan(5.f);
 		}
 	}
 }

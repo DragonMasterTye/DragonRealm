@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "DRGameModeBase.generated.h"
 
+class UDRSaveGame;
 class UEnvQueryInstanceBlueprintWrapper;
 
 namespace EEnvQueryStatus
@@ -21,13 +22,21 @@ class DRAGONREALM_API ADRGameModeBase : public AGameModeBase
 
 public:
 
+	// Ctor
 	ADRGameModeBase();
 	
 	// Unreal Functions
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void StartPlay() override;
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
 
 	// Functions
 	virtual void OnActorKilled(AActor* Victim, AActor* Killer);
+	
+	// SaveGame
+	UFUNCTION(BlueprintCallable, Category = "DR|SaveGame")
+	void WriteSaveGame(FString InSaveGameName = "DRSaveGame");
+	void LoadSaveGame();
 
 	// Console Functions
 	UFUNCTION(Exec)
@@ -46,6 +55,11 @@ protected:
 	UEnvQuery* SpawnBotQuery;
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
 	float RespawnDelay;
+
+	// SaveGame
+	FString SaveSlotName;
+	UPROPERTY()
+	UDRSaveGame* CurrentSaveGame;
 
 	// Timer
 	FTimerHandle TimerHandle_SpawnBots;

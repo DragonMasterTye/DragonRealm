@@ -9,14 +9,28 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "DrawDebugHelpers.h"
 #include "ActionSystem/DRAttributeComponent.h"
+#include "Core/DRSaveGame.h"
+#include "GameFramework/GameStateBase.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/DRPlayerCharacter.h"
+#include "Player/DRPlayerState.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("DR.SpawnBots"), false, TEXT("Enable Spawning of bots via timer"), ECVF_Cheat);
 
+// Ctor
 ADRGameModeBase::ADRGameModeBase()
 {
 	SpawnTimerInterval = 2.f;
 	RespawnDelay = 2.f;
+	SaveSlotName = "DRSaveGame";
+}
+
+// Unreal Functions
+void ADRGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	LoadSaveGame();
 }
 
 void ADRGameModeBase::StartPlay()
@@ -26,6 +40,18 @@ void ADRGameModeBase::StartPlay()
 	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ADRGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
+void ADRGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+{
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
+
+	ADRPlayerState* PS = NewPlayer->GetPlayerState<ADRPlayerState>();
+	if(PS)
+	{
+		PS->LoadPlayerState(CurrentSaveGame);
+	}
+}
+
+// Functions------------------------------------------------------
 void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
 {
 	ADRPlayerCharacter* PlayerChar = Cast<ADRPlayerCharacter>(Victim);
@@ -40,6 +66,45 @@ void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
 	}
 
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(Victim), *GetNameSafe(Killer));
+}
+
+// Save Game
+void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
+{
+	SaveSlotName = InSaveGameName;
+
+	for(int32 i = 0; i < GameState->PlayerArray.Num(); i++)
+	{
+		ADRPlayerState* PS = Cast<ADRPlayerState>(GameState->PlayerArray[i]);
+		if(PS)
+		{
+			PS->SavePlayerState(CurrentSaveGame);
+			break; // SingePlayer only atm @TODO make multiplayer
+		}
+	}
+	
+	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlotName, 0);
+}
+
+void ADRGameModeBase::LoadSaveGame()
+{
+	if(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0))
+	{
+		CurrentSaveGame = Cast<UDRSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
+		if(CurrentSaveGame == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame Data"));
+	}
+	else
+	{
+		CurrentSaveGame = Cast<UDRSaveGame>(UGameplayStatics::CreateSaveGameObject(UDRSaveGame::StaticClass()));
+		
+		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data"));
+	}
 }
 
 void ADRGameModeBase::DR_KillAllAI()
