@@ -20,6 +20,8 @@ public:
 	// Functions
 	virtual void StartAction_Implementation(AActor* Instigator) override;
 	virtual void StopAction_Implementation(AActor* Instigator) override;
+	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
+	float GetTimeRemaining() const;
 
 protected:
 

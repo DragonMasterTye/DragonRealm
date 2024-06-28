@@ -40,6 +40,8 @@ public:
 	FName ActionName;
 	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
 	bool bAutoStart;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Assignables")
+	UTexture2D* Icon;
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
@@ -62,7 +64,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
 	FGameplayTagContainer GrantsTags;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
-	FGameplayTagContainer BlockedByTags;	
+	FGameplayTagContainer BlockedByTags;
+	UPROPERTY(Replicated)
+	float TimeStarted;
 
 	// Functions
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")

@@ -4,6 +4,7 @@
 #include "ActionSystem/DRActionEffect.h"
 
 #include "ActionSystem/DRActionComponent.h"
+#include "GameFramework/GameStateBase.h"
 
 
 UDRActionEffect::UDRActionEffect()
@@ -50,6 +51,18 @@ void UDRActionEffect::StopAction_Implementation(AActor* Instigator)
 	{
 		ActionComponent->RemoveAction(this);
 	}
+}
+
+float UDRActionEffect::GetTimeRemaining() const
+{
+	AGameStateBase* GS = GetWorld()->GetGameState();
+	if(GS)
+	{
+		float EndTime = TimeStarted + Duration;
+		return EndTime - GS->GetServerWorldTimeSeconds();
+	}
+
+	return Duration;
 }
 
 void UDRActionEffect::ExecutePeriodEffect_Implementation(AActor* Instigator)
