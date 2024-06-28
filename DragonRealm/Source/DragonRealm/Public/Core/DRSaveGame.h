@@ -6,9 +6,21 @@
 #include "GameFramework/SaveGame.h"
 #include "DRSaveGame.generated.h"
 
-/**
- * 
- */
+USTRUCT()
+struct FActorSaveData
+{
+	GENERATED_BODY()
+
+public:
+
+	UPROPERTY()
+	FString ActorName;
+	UPROPERTY()
+	FTransform ActorTransform;
+	UPROPERTY()
+	TArray<uint8> ByteData;
+};
+
 UCLASS()
 class DRAGONREALM_API UDRSaveGame : public USaveGame
 {
@@ -18,5 +30,7 @@ public:
 
 	UPROPERTY()
 	int32 EXP;
+	UPROPERTY()
+	TArray<FActorSaveData> SavedActors;
 	
 };

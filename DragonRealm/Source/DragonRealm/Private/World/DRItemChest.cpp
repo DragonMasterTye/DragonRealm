@@ -27,6 +27,12 @@ void ADRItemChest::Interact_Implementation(APawn* InstigatorPawn)
 	OnRep_LidOpened();
 }
 
+void ADRItemChest::OnActorLoaded_Implementation()
+{
+	IDRGameplayInterface::OnActorLoaded_Implementation();
+	OnRep_LidOpened();
+}
+
 void ADRItemChest::OnRep_LidOpened_Implementation()
 {
 	

@@ -9,11 +9,13 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "DrawDebugHelpers.h"
 #include "ActionSystem/DRAttributeComponent.h"
+#include "Core/DRGameplayInterface.h"
 #include "Core/DRSaveGame.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DRPlayerCharacter.h"
 #include "Player/DRPlayerState.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("DR.SpawnBots"), false, TEXT("Enable Spawning of bots via timer"), ECVF_Cheat);
 
@@ -73,6 +75,7 @@ void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
 {
 	SaveSlotName = InSaveGameName;
 
+	// Save PlayerStates
 	for(int32 i = 0; i < GameState->PlayerArray.Num(); i++)
 	{
 		ADRPlayerState* PS = Cast<ADRPlayerState>(GameState->PlayerArray[i]);
@@ -81,6 +84,31 @@ void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
 			PS->SavePlayerState(CurrentSaveGame);
 			break; // SingePlayer only atm @TODO make multiplayer
 		}
+	}
+
+	CurrentSaveGame->SavedActors.Empty();
+
+	// Save ActorData
+	for(FActorIterator It(GetWorld()); It; ++It)
+	{
+		AActor* Actor = *It;
+		// Only Interested in "Gameplay Actors"
+		if(!Actor->Implements<UDRGameplayInterface>())
+		{
+			continue;
+		}
+		
+		FActorSaveData ActorData;
+		ActorData.ActorName = Actor->GetName();
+		ActorData.ActorTransform = Actor->GetTransform();
+		
+		FMemoryWriter MemoryWriter(ActorData.ByteData); // Pass in the area to fill with dara from actor
+		FObjectAndNameAsStringProxyArchive Archive(MemoryWriter, true);
+		Archive.ArIsSaveGame = true; // Find only variables with UPROPERTY(SaveGame)
+		
+		Actor->Serialize(Archive); // Convert Actor's SaveGame UPROPERTIES into binary array
+
+		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
 	
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlotName, 0);
@@ -98,13 +126,43 @@ void ADRGameModeBase::LoadSaveGame()
 		}
 
 		UE_LOG(LogTemp, Log, TEXT("Loaded SaveGame Data"));
+
+		// Populate ActorData
+		for(FActorIterator It(GetWorld()); It; ++It)
+		{
+			AActor* Actor = *It;
+			// Only Interested in "Gameplay Actors"
+			if(!Actor->Implements<UDRGameplayInterface>())
+			{
+				continue;
+			}
+
+			for(FActorSaveData ActorData : CurrentSaveGame->SavedActors)
+			{
+				if(ActorData.ActorName == Actor->GetName())
+				{
+					Actor->SetActorTransform(ActorData.ActorTransform);
+
+					FMemoryReader MemoryReader(ActorData.ByteData);
+					FObjectAndNameAsStringProxyArchive Archive(MemoryReader, true);
+					Archive.ArIsSaveGame = true; // Find only variables with UPROPERTY(SaveGame)
+		
+					Actor->Serialize(Archive); // Convert binary array back into Actor's variables
+
+					IDRGameplayInterface::Execute_OnActorLoaded(Actor);
+					
+					break;
+				}
+			}
+		}
 	}
-	else
+	else// No SaveGameObject in that slot, create a new one
 	{
 		CurrentSaveGame = Cast<UDRSaveGame>(UGameplayStatics::CreateSaveGameObject(UDRSaveGame::StaticClass()));
 		
 		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data"));
 	}
+	// Done Loading SaveGameObject
 }
 
 void ADRGameModeBase::DR_KillAllAI()

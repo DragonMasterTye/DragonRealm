@@ -22,6 +22,7 @@ public:
 
 	// Functions
 	virtual void Interact_Implementation(APawn* InstigatorPawn);
+	virtual void OnActorLoaded_Implementation() override;
 
 protected:
 	
@@ -32,7 +33,7 @@ protected:
 	UStaticMeshComponent* LidMesh;
 
 	// Replication
-	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly) // RepNotify
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", VisibleAnywhere, BlueprintReadOnly, SaveGame) // RepNotify
 	bool bLidOpened;
 	UFUNCTION(BlueprintNativeEvent)
 	void OnRep_LidOpened();
