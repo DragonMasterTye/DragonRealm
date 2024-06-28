@@ -1,7 +1,7 @@
 // Copyright Landon Morrison 2024
 
 
-#include "Player/DRAnimInstance.h"
+#include "Core/DRAnimInstance.h"
 
 #include "GameplayTagContainer.h"
 #include "ActionSystem/DRActionComponent.h"
