@@ -9,6 +9,7 @@
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "DrawDebugHelpers.h"
 #include "ActionSystem/DRAttributeComponent.h"
+#include "AI/Data/DRMonsterData.h"
 #include "Core/DRGameplayInterface.h"
 #include "Core/DRSaveGame.h"
 #include "GameFramework/GameStateBase.h"
@@ -211,11 +212,11 @@ void ADRGameModeBase::SpawnBotTimerElapsed()
 
 	if(ensureAlways(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ADRGameModeBase::OnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ADRGameModeBase::OnBotSpawnQueryCompleted);
 	}
 }
 
-void ADRGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+void ADRGameModeBase::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
 	EEnvQueryStatus::Type QueryStatus)
 {
 	if(QueryStatus != EEnvQueryStatus::Success)
@@ -228,12 +229,26 @@ void ADRGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
 	if(Locations.IsValidIndex(0))
 	{
-		if(ensureMsgf(MinionClass, TEXT("No MinionClass Assigned in GameModeBase!")))
+		/*if(ensureMsgf(MinionClass, TEXT("No MinionClass Assigned in GameModeBase!")))
+		{
+			GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
+		}*/
+		if(MonsterTable)
+		{
+			TArray<FMonsterInfoRow*> MonsterRows;
+			MonsterTable->GetAllRows("", MonsterRows);
+
+			int32 RandomIndex = FMath::RandRange(0, MonsterRows.Num()-1);
+			FMonsterInfoRow* SelectedInfoRow = MonsterRows[RandomIndex];
+
+			GetWorld()->SpawnActor<AActor>(SelectedInfoRow->MonsterData->MonsterClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
+		}
+		else
 		{
 			GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
 		}
-
-		DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false);
+		
+		//DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false);
 	}
 }
 

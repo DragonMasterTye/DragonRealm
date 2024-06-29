@@ -6,15 +6,45 @@
 #include "GameFramework/GameModeBase.h"
 #include "DRGameModeBase.generated.h"
 
+class UDRMonsterData;
 class UDRSaveGame;
+class UDataTable;
 class UEnvQueryInstanceBlueprintWrapper;
-
+class UEnvQuery;
 namespace EEnvQueryStatus
 {
 	enum Type : int;
 }
 
-class UEnvQuery;
+// DataTable Struct
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+public:
+
+	FMonsterInfoRow()
+	{
+		SpawnWeight = 1.f;
+		SpawnCost = 5.f;
+		KillReward = 10.f;
+	}
+	
+	// Properties
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UDRMonsterData* MonsterData;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnWeight;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float SpawnCost;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float KillReward;
+	
+};
+
+
+// GameMode
 UCLASS()
 class DRAGONREALM_API ADRGameModeBase : public AGameModeBase
 {
@@ -45,15 +75,17 @@ public:
 protected:
 
 	// Properties
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	float SpawnTimerInterval;
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	UCurveFloat* DifficultyCurve;
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	TSubclassOf<AActor>MinionClass;
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	UEnvQuery* SpawnBotQuery;
-	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
+	UDataTable* MonsterTable;
+	UPROPERTY(EditDefaultsOnly, Category = "DR|Respawn")
 	float RespawnDelay;
 
 	// SaveGame
@@ -68,7 +100,7 @@ protected:
 	UFUNCTION()
 	void SpawnBotTimerElapsed();
 	UFUNCTION()
-	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+	void OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	UFUNCTION()
 	void OnRespawnPlayerTimerElapsed(AController* Controller);
 	
