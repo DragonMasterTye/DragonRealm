@@ -8,7 +8,11 @@
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 
+// CVAR
 static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), false, TEXT("Enable Debug messages and logs for Tags"), ECVF_Cheat);
+
+// STAT
+DECLARE_CYCLE_STAT(TEXT("StartActionByName"), STAT_DRStartActionByName, STATGROUP_DRAGONREALM);
 
 // Ctor
 UDRActionComponent::UDRActionComponent()
@@ -92,6 +96,8 @@ void UDRActionComponent::RemoveAction(UDRAction* ActionToRemove)
 
 bool UDRActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 {
+	SCOPE_CYCLE_COUNTER(STAT_DRStartActionByName);
+	
 	for(UDRAction* Action : Actions)
 	{
 		if(Action && Action->ActionName == ActionName)

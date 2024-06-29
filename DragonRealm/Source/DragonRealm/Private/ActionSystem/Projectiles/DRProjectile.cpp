@@ -15,6 +15,7 @@ static TAutoConsoleVariable<bool> CVarDebugProjectile(TEXT("DR.DebugProjectile")
 ADRProjectile::ADRProjectile()
 {
 	bReplicates = true;
+	InitialLifeSpan = 10.f;
 	
 	// Components
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereComponent");
@@ -38,7 +39,7 @@ void ADRProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UGameplayStatics::SpawnEmitterAtLocation(this, SpawnVFX, GetActorLocation(), GetActorRotation());
+	//UGameplayStatics::SpawnEmitterAtLocation(this, SpawnVFX, GetActorLocation(), GetActorRotation());
 }
 
 void ADRProjectile::PostInitializeComponents()

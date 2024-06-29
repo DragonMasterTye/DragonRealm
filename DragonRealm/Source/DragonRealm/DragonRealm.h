@@ -4,6 +4,10 @@
 
 #include "CoreMinimal.h"
 
+// STAT
+DECLARE_STATS_GROUP(TEXT("DRAGONREALM_Game"), STATGROUP_DRAGONREALM, STATCAT_Advanced);
+
+// Debug Functions
 static void DRLogOnScreen(UObject* WorldContext, FString Msg, FColor Color = FColor::White, float Duration = 5.0f)
 {
 	if(!ensure(WorldContext))
