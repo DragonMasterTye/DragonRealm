@@ -42,6 +42,7 @@ public:
 	bool bAutoStart;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Assignables")
 	UTexture2D* Icon;
+	//TSoftObjectPtr<UTexture2D> Icon; // Could be set as a soft reference but is rather small to matter
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")

@@ -8,10 +8,13 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "DrawDebugHelpers.h"
+#include "ActionSystem/DRActionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "AI/Data/DRMonsterData.h"
 #include "Core/DRGameplayInterface.h"
 #include "Core/DRSaveGame.h"
+#include "DragonRealm/DragonRealm.h"
+#include "Engine/AssetManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/DRPlayerCharacter.h"
@@ -55,22 +58,6 @@ void ADRGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 }
 
 // Functions------------------------------------------------------
-void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
-{
-	ADRPlayerCharacter* PlayerChar = Cast<ADRPlayerCharacter>(Victim);
-	if(PlayerChar)
-	{
-		FTimerHandle TimerHandle_RespawnDelay;
-
-		FTimerDelegate Delegate;
-		Delegate.BindUFunction(this, "OnRespawnPlayerTimerElapsed", PlayerChar->GetController());
-		
-		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
-	}
-
-	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(Victim), *GetNameSafe(Killer));
-}
-
 // Save Game
 void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
 {
@@ -115,6 +102,7 @@ void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
 	UGameplayStatics::SaveGameToSlot(CurrentSaveGame, SaveSlotName, 0);
 }
 
+// Load Game
 void ADRGameModeBase::LoadSaveGame()
 {
 	if(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0))
@@ -166,20 +154,34 @@ void ADRGameModeBase::LoadSaveGame()
 	// Done Loading SaveGameObject
 }
 
-void ADRGameModeBase::DR_KillAllAI()
+// Kill Tracking
+void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
 {
-	for(TActorIterator<ADRAICharacter> It(GetWorld()); It; ++It)
+	ADRPlayerCharacter* PlayerChar = Cast<ADRPlayerCharacter>(Victim);
+	if(PlayerChar)
 	{
-		ADRAICharacter* Bot = *It;
+		FTimerHandle TimerHandle_RespawnDelay;
 
-		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributes(Bot);
-		if(ensure(AttributeComponent) && AttributeComponent->IsAlive())
-		{
-			AttributeComponent->Kill(this); // @fixme update to player that input command
-		}
+		FTimerDelegate Delegate;
+		Delegate.BindUFunction(this, "OnRespawnPlayerTimerElapsed", PlayerChar->GetController());
+		
+		GetWorldTimerManager().SetTimer(TimerHandle_RespawnDelay, Delegate, RespawnDelay, false);
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(Victim), *GetNameSafe(Killer));
+}
+
+void ADRGameModeBase::OnRespawnPlayerTimerElapsed(AController* Controller)
+{
+	if(Controller)
+	{
+		Controller->UnPossess();
+		
+		RestartPlayer(Controller);
 	}
 }
 
+// Debug Bot Spawning
 void ADRGameModeBase::SpawnBotTimerElapsed()
 {
 	if(!CVarSpawnBots.GetValueOnGameThread())
@@ -225,39 +227,80 @@ void ADRGameModeBase::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper
 		return;
 	}
 
-	
-	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if(Locations.IsValidIndex(0))
-	{
-		/*if(ensureMsgf(MinionClass, TEXT("No MinionClass Assigned in GameModeBase!")))
+	// if(CVarSpawnBots.GetValueOnGameThread()) // Not needed because this CVAR turns off the Query above
+	//{
+		TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
+		if(Locations.IsValidIndex(0))
 		{
-			GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
-		}*/
-		if(MonsterTable)
-		{
-			TArray<FMonsterInfoRow*> MonsterRows;
-			MonsterTable->GetAllRows("", MonsterRows);
+			/*if(ensureMsgf(MinionClass, TEXT("No MinionClass Assigned in GameModeBase!")))
+			{
+				GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
+			}*/
+			if(MonsterTable)
+			{
+				TArray<FMonsterInfoRow*> MonsterRows;
+				MonsterTable->GetAllRows("", MonsterRows);
 
-			int32 RandomIndex = FMath::RandRange(0, MonsterRows.Num()-1);
-			FMonsterInfoRow* SelectedInfoRow = MonsterRows[RandomIndex];
+				int32 RandomIndex = FMath::RandRange(0, MonsterRows.Num()-1);
+				FMonsterInfoRow* SelectedInfoRow = MonsterRows[RandomIndex];
 
-			GetWorld()->SpawnActor<AActor>(SelectedInfoRow->MonsterData->MonsterClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
+				UAssetManager* Manager = UAssetManager::GetIfInitialized();
+				if(Manager)
+				{
+					DRLogOnScreen(this, "Loading Monster...", FColor::Green);
+					
+					TArray<FName> Bundles; // Tagged Data to be loaded (i.e. UI or In-Game)
+					FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ADRGameModeBase::OnMonsterLoaded, SelectedInfoRow->MonsterDataID, Locations[0]); // Triggers OnMonsterLoaded and passes Params
+					
+					Manager->LoadPrimaryAsset(SelectedInfoRow->MonsterDataID, Bundles, Delegate);
+				}
+			}
 		}
-		else
-		{
-			GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0] + (0,0,100), FRotator::ZeroRotator);
-		}
-		
 		//DrawDebugSphere(GetWorld(), Locations[0], 50.f, 20, FColor::Blue, false);
+	//}
+}
+
+void ADRGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLocation)
+{
+	DRLogOnScreen(this, "Finished Loading", FColor::Green);
+
+	UAssetManager* Manager = UAssetManager::GetIfInitialized();
+	if(Manager)
+	{
+		UDRMonsterData* MonsterData = Cast<UDRMonsterData>(Manager->GetPrimaryAssetObject(LoadedID));
+		if(MonsterData)
+		{
+			//																			// Adding Z Location to spawn above ground
+			AActor* NewBot = GetWorld()->SpawnActor<AActor>(MonsterData->MonsterClass, SpawnLocation + (0,0,100), FRotator::ZeroRotator); 
+			if(NewBot)
+			{
+
+				DRLogOnScreen(this, FString::Printf(TEXT("Spawned enemy: %s (%s)"), *GetNameSafe(NewBot), *GetNameSafe(MonsterData->MonsterClass)));
+
+				UDRActionComponent* ActionComponent = Cast<UDRActionComponent>(NewBot->GetComponentByClass(UDRActionComponent::StaticClass()));
+				if(ActionComponent)
+				{
+					for(TSubclassOf<UDRAction> ActionClass : MonsterData->Actions)
+					{
+						ActionComponent->AddAction(NewBot, ActionClass);
+					}
+				}
+			}
+		}
 	}
 }
 
-void ADRGameModeBase::OnRespawnPlayerTimerElapsed(AController* Controller)
+// Console Functions
+void ADRGameModeBase::DR_KillAllAI()
 {
-	if(Controller)
+	for(TActorIterator<ADRAICharacter> It(GetWorld()); It; ++It)
 	{
-		Controller->UnPossess();
-		
-		RestartPlayer(Controller);
+		ADRAICharacter* Bot = *It;
+
+		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributes(Bot);
+		if(ensure(AttributeComponent) && AttributeComponent->IsAlive())
+		{
+			AttributeComponent->Kill(this); // @fixme update to player that input command
+		}
 	}
 }

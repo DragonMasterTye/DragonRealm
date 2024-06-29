@@ -20,5 +20,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Spawn Info")
 	TArray<TSubclassOf<UDRAction>> Actions;;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|UI")
-	UTexture2D* Icon;;
+	UTexture2D* Icon;
+
+	// Unreal Functions
+	virtual FPrimaryAssetId GetPrimaryAssetId() const override
+	{
+		return FPrimaryAssetId("Monsters", GetFName());
+	}
 };

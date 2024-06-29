@@ -8,7 +8,7 @@
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 
-static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), true, TEXT("Enable Debug messages and logs for Tags"), ECVF_Cheat);
+static TAutoConsoleVariable<bool> CVarDebugTags(TEXT("DR.DebugTags"), false, TEXT("Enable Debug messages and logs for Tags"), ECVF_Cheat);
 
 // Ctor
 UDRActionComponent::UDRActionComponent()

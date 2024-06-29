@@ -33,7 +33,8 @@ public:
 	
 	// Properties
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	UDRMonsterData* MonsterData;
+	FPrimaryAssetId MonsterDataID;
+	// UDRMonsterData* MonsterData; // Standard Method
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	float SpawnWeight;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -103,5 +104,6 @@ protected:
 	void OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
 	UFUNCTION()
 	void OnRespawnPlayerTimerElapsed(AController* Controller);
+	void OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLocation);
 	
 };
