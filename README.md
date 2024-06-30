@@ -1,6 +1,6 @@
 # DragonRealm
 ## A Co-op Action-Adventure/RPG created by SoloDev Landon Morrison
-## Check out the VERSIONS on the right for a playable demo --->
+## Check out the "Releases" on the right for a playable demo --->
 
 ![DragonRealmProject](https://github.com/DragonMasterTye/DragonRealm/assets/10467603/c87f7028-9c60-44a6-a461-58a15592f28d)
 
