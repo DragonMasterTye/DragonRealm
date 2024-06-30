@@ -26,7 +26,7 @@ void UDRActionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(GetOwner()->HasAuthority())
+	if(GetOwner()->HasAuthority() && !DefaultActions.IsEmpty())
 	{
 		for(TSubclassOf<UDRAction> ActionClass : DefaultActions)
 		{
@@ -116,6 +116,9 @@ bool UDRActionComponent::StartActionByName(AActor* Instigator, FName ActionName)
 			{
 				ServerStartAction(Instigator, ActionName);
 			}
+
+			// Bookmark for Unreal Insights
+			TRACE_BOOKMARK(TEXT("StartAction: %s"), *GetNameSafe(Action));
 			
 			Action->StartAction(Instigator);
 			return true;
@@ -152,7 +155,6 @@ void UDRActionComponent::ServerStopAction_Implementation(AActor* Instigator, FNa
 {
 	StopActionByName(Instigator, ActionName);
 }
-
 
 bool UDRActionComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
 {

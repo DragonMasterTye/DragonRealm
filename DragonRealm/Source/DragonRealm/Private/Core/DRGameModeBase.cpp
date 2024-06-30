@@ -8,6 +8,7 @@
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "DrawDebugHelpers.h"
+#include "ActionSystem/DRAction.h"
 #include "ActionSystem/DRActionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "AI/Data/DRMonsterData.h"
