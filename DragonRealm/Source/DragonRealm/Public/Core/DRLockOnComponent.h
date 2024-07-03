@@ -20,13 +20,16 @@ protected:
 
 	// Properties
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|LockOn")
-	float Period;
+	float TicksPerSecond;
 
 	// Timers
 	FTimerHandle TimerHandle_SearchForLock;
 	
 	// Unreal Functions
 	virtual void BeginPlay() override;
-	
+
+	// Functions
 	void SearchForLock();
+	void LockOn();
+	void LockOff();
 };
