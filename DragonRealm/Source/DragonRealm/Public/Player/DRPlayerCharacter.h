@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "DRPlayerCharacter.generated.h"
 
+class UDRLockOnComponent;
 class UDRActionComponent;
 class ADRProjectile;
 class UDRAttributeComponent;
@@ -46,6 +47,8 @@ protected:
 	UDRAttributeComponent* AttributeComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UDRActionComponent* ActionComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UDRLockOnComponent* LockOnComponent;
 	
 	//  Properties
 	UPROPERTY(EditAnywhere, Category="DR|Assignables")

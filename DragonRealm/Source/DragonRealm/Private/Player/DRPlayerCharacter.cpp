@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Core/DRLockOnComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,6 +40,7 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	InteractionComponent = CreateDefaultSubobject<UDRInteractionComponent>("InteractionComponent");
 	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
 	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
+	LockOnComponent = CreateDefaultSubobject<UDRLockOnComponent>("LockOnComponent");
 	
 	// Setting Defaults
 	GetCharacterMovement()->bOrientRotationToMovement = true;
