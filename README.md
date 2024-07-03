@@ -2,7 +2,7 @@
 ## A Co-op Action-Adventure/RPG created by SoloDev Landon Morrison
 ## Check out the "Releases" on the right for a playable demo --->
 
-![DragonRealmProject](https://github.com/DragonMasterTye/DragonRealm/assets/10467603/c87f7028-9c60-44a6-a461-58a15592f28d)
+![DragonRealmProject](https://github.com/DragonMasterTye/DragonRealm/assets/10467603/b200ee55-21df-4ad4-816b-2469ede6c1e3)
 
 ### This project is not meant to be functional on other machines.
 ### Some of the source code is exposed here for you to peruse to get an idea of how the game works and how I code but it is not necessarily up-to-date or all I have used in this project.
