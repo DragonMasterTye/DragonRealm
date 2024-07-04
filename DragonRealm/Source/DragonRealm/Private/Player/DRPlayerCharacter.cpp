@@ -134,6 +134,11 @@ void ADRPlayerCharacter::DR_HealSelf(float Amount /* = 100 */)
 	AttributeComponent->ApplyHealthChange(this, Amount);
 }
 
+UCameraComponent* ADRPlayerCharacter::GetCamera() const
+{
+	return CameraComponent;
+}
+
 void ADRPlayerCharacter::PrimaryInteract()
 {
 	if(InteractionComponent)

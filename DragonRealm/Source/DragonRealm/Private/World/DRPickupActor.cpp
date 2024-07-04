@@ -15,6 +15,7 @@ ADRPickupActor::ADRPickupActor()
 	RootComponent = SphereComponent;
 }
 
+// Functions ---------------------------------
 void ADRPickupActor::Interact_Implementation(APawn* InstigatorPawn)
 {
 	IDRGameplayInterface::Interact_Implementation(InstigatorPawn);

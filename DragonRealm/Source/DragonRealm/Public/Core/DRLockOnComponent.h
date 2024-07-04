@@ -21,6 +21,14 @@ protected:
 	// Properties
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|LockOn")
 	float TicksPerSecond;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|LockOn")
+	AActor* TargetedActor;
+	UPROPERTY(EditDefaultsOnly, Category = "DR|LockOn")
+	float TraceDistance;
+	UPROPERTY(EditDefaultsOnly, Category = "DR|LockOn")
+	float TraceRadius;
+	UPROPERTY(EditDefaultsOnly, Category = "DR|LockOn")
+	TEnumAsByte<ECollisionChannel> TraceChannel;
 
 	// Timers
 	FTimerHandle TimerHandle_SearchForLock;

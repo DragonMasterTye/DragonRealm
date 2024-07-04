@@ -29,6 +29,8 @@ public:
 	// Function
 	UFUNCTION(Exec)
 	void DR_HealSelf(float Amount = 100.f);
+	UFUNCTION()
+	UCameraComponent* GetCamera() const;
 
 protected:
 

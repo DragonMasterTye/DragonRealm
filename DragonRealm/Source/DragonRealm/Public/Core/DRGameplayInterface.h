@@ -23,9 +23,11 @@ class DRAGONREALM_API IDRGameplayInterface
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
 
+	// Functions
 	UFUNCTION(BlueprintNativeEvent)
 	void OnActorLoaded();
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void Interact(APawn* InstigatorPawn);
+	UFUNCTION(BlueprintNativeEvent)
+	bool IsTargetable();
 };

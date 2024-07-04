@@ -3,6 +3,8 @@
 
 #include "Core/DRLockOnComponent.h"
 
+#include "Camera/CameraComponent.h"
+#include "Core/DRGameplayInterface.h"
 #include "DragonRealm/DragonRealm.h"
 #include "Player/DRPlayerCharacter.h"
 
@@ -10,6 +12,9 @@
 UDRLockOnComponent::UDRLockOnComponent()
 {
 	TicksPerSecond = 30.f;
+	TraceDistance = 5000.f;
+	TraceRadius = 200.f;
+	TraceChannel = ECC_Visibility;
 }
 
 // Unreal Functions
@@ -33,9 +38,44 @@ void UDRLockOnComponent::SearchForLock()
 		return;
 	}
 	
-	//DRLogOnScreen(this, FString::Printf(TEXT("Time: %f"), GetWorld()->GetTimeSeconds()), FColor::White, 0.0f);
+	// DRLogOnScreen(this, FString::Printf(TEXT("Time: %f"), GetWorld()->GetTimeSeconds()), FColor::White, 0.0f);
 
 	// Sweep for Targetables
+	//if(!TargetedActor)
+	//{
+		TArray<FHitResult> Hits;
+		FVector Start = Owner->GetCamera()->GetComponentLocation();
+		FRotator Rotation = Owner->GetCamera()->GetComponentRotation();
+		FVector End = Start + (Rotation.Vector() * TraceDistance);
+		FCollisionObjectQueryParams ObjectQueryParams;
+		ObjectQueryParams.AddObjectTypesToQuery(TraceChannel);
+		FCollisionShape Shape;
+		Shape.SetSphere(TraceRadius);
+	
+		bool bBlockingHit = GetWorld()->SweepMultiByObjectType(Hits, Start, End, FQuat::Identity, ObjectQueryParams, Shape);
+		FColor LineColor = bBlockingHit ? FColor::Green : FColor::Red; // Debug Trace
+		
+		if(bBlockingHit)
+		{
+			for (FHitResult Hit : Hits)
+			{
+				DrawDebugSphere(GetWorld(), Hit.ImpactPoint, TraceRadius, 16, LineColor, false, 0.f); // Debug Trace
+				
+				AActor* HitActor = Hit.GetActor();
+				if(HitActor && HitActor->GetClass()->ImplementsInterface(UDRGameplayInterface::StaticClass()))
+				{
+					if(IDRGameplayInterface::Execute_IsTargetable(HitActor))
+					{
+						TargetedActor = HitActor;
+						DRLogOnScreen(this, FString::Printf(TEXT("HitActor: %s"), *GetNameSafe(HitActor)));
+						break;
+					}
+				}
+			}
+		}
+	//}
+	
+
 
 	// Highlight Targetable
 }
