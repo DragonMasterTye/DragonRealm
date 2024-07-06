@@ -81,7 +81,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	UCurveFloat* DifficultyCurve;
 	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
-	TSubclassOf<AActor>MinionClass;
+	TSubclassOf<AActor> MinionClass;
 	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
 	UEnvQuery* SpawnBotQuery;
 	UPROPERTY(EditDefaultsOnly, Category = "DR|AI")
