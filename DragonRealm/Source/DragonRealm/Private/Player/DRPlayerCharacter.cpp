@@ -3,6 +3,8 @@
 
 #include "Player/DRPlayerCharacter.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "Core/DRInteractionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "ActionSystem/Projectiles/DRProjectile.h"
@@ -69,46 +71,109 @@ void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-	PlayerInputComponent->BindAxis("MoveForward", this, &ADRPlayerCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &ADRPlayerCharacter::MoveRight);
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
+	const APlayerController* PC = GetController<APlayerController>();
+	const ULocalPlayer* LP = PC->GetLocalPlayer();
 
-	PlayerInputComponent->BindAction("PrimaryAction", IE_Pressed, this, &ADRPlayerCharacter::PrimaryAction);
-	PlayerInputComponent->BindAction("SecondaryAction", IE_Pressed, this, &ADRPlayerCharacter::SecondaryAction);
-	PlayerInputComponent->BindAction("UltimateAction", IE_Pressed, this, &ADRPlayerCharacter::UltimateAction);
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
-	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ADRPlayerCharacter::PrimaryInteract);
-	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ADRPlayerCharacter::StartSprint);
-	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ADRPlayerCharacter::StopSprint);
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = LP->GetSubsystem<UEnhancedInputLocalPlayerSubsystem>();
+	check(Subsystem);
+
+	Subsystem->ClearAllMappings();
+	Subsystem->AddMappingContext(DefaultInputMapping, 0);
+	
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+	// Move, Jump, Interact
+	EnhancedInputComponent->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::Move);
+	EnhancedInputComponent->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ACharacter::Jump);
+	EnhancedInputComponent->BindAction(Input_Interact, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryInteract);
+
+	// Sprint
+	EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Started, this, &ADRPlayerCharacter::StartSprint);
+	EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Completed, this, &ADRPlayerCharacter::StopSprint);
+
+	// Mouse & Keyboard
+	EnhancedInputComponent->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::LookMouse);
+	// Gamepad
+	EnhancedInputComponent->BindAction(Input_LookGamepad, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::LookGamepad);
+
+	// Actions
+	EnhancedInputComponent->BindAction(Input_PrimaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryAction);
+	EnhancedInputComponent->BindAction(Input_SecondaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::SecondaryAction);
+	EnhancedInputComponent->BindAction(Input_UltimateAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::UltimateAction);
+	
 }
 
-// Functions --------------------------------------
-void ADRPlayerCharacter::MoveForward(float Value)
+// Movement
+void ADRPlayerCharacter::Move(const FInputActionInstance& Instance)
 {
 	FRotator ControlRot = GetControlRotation();
 	ControlRot.Pitch = 0.0f;
 	ControlRot.Roll = 0.0f;
-	
-	AddMovementInput(ControlRot.Vector(), Value);
+
+	// Get value from input (combined value from WASD keys or single Gamepad stick) and convert to 2D Vector
+	const FVector2D AxisValue = Instance.GetValue().Get<FVector2D>();
+
+	// Move forward/back
+	if(AxisValue.Y != 0.0f)
+	{
+		AddMovementInput(ControlRot.Vector(), AxisValue.Y);
+	}
+
+	// Move Right/Left strafe
+	if(AxisValue.X != 0.0f)
+	{
+		const FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+		AddMovementInput(RightVector, AxisValue.X);
+	}
 }
 
-void ADRPlayerCharacter::MoveRight(float Value)
+void ADRPlayerCharacter::LookMouse(const FInputActionValue& InputValue)
 {
-	FRotator ControlRot = GetControlRotation();
-	ControlRot.Pitch = 0.0f;
-	ControlRot.Roll = 0.0f;
-
-	// X = Forward
-	// Y = Right
-	// Z = Up
-	FVector RightVector = FRotationMatrix(ControlRot).GetScaledAxis(EAxis::Y);
+	const FVector2D Value = InputValue.Get<FVector2D>();
 	
-	AddMovementInput(RightVector, Value);
+	AddControllerYawInput(Value.X);
+	AddControllerPitchInput(Value.Y);
 }
+
+void ADRPlayerCharacter::LookGamepad(const FInputActionValue& InputValue)
+{
+	FVector2D Value = InputValue.Get<FVector2D>();
+
+	// Track negative as we'll lose this during the conversion
+	bool XNegative = Value.X < 0.f;
+	bool YNegative = Value.Y < 0.f;
+
+	// Can further modify with 'sensitivity' settings
+	static const float LookYawRate = 100.0f; // Left Right Secnsitivty
+	static const float LookPitchRate = 50.0f; // Up Down Sensitivty
+
+	// non-linear to make aiming a little easier
+	Value = Value * Value;
+
+	if (XNegative)
+	{
+		Value.X *= -1.f;
+	}
+	if (YNegative)
+	{
+		Value.Y *= -1.f;
+	}
+
+	// Aim assist
+	// todo: may need to ease this out and/or change strength based on distance to target
+	/*float RateMultiplier = 1.0f;
+	if (bHasPawnTarget)
+	{
+		RateMultiplier = 0.5f;
+	}*/
+
+	AddControllerYawInput(Value.X * (LookYawRate /** RateMultiplier*/) * GetWorld()->GetDeltaSeconds());
+	AddControllerPitchInput(Value.Y * (LookPitchRate /** RateMultiplier*/) * GetWorld()->GetDeltaSeconds());
+}
+
 
 void ADRPlayerCharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
-	float NewHealth, float Delta, float ActualDelta)
+                                                float NewHealth, float Delta, float ActualDelta)
 {	
 	if(ActualDelta < 0.f)
 	{

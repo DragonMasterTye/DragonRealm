@@ -6,6 +6,10 @@
 #include "GameFramework/Character.h"
 #include "DRPlayerCharacter.generated.h"
 
+struct FInputActionValue;
+struct FInputActionInstance;
+class UInputAction;
+class UInputMappingContext;
 class UDRLockOnComponent;
 class UDRActionComponent;
 class ADRProjectile;
@@ -70,11 +74,18 @@ protected:
 	virtual void PostInitializeComponents() override;
 	virtual FVector GetPawnViewLocation() const override;
 	
-	// Functions
-	void MoveForward(float Value);
-	void MoveRight(float Value);
+	// Movement
+	void Move(const FInputActionInstance& Instance);
+
+	// Camera Control
+	void LookMouse(const FInputActionValue& InputValue);
+	void LookGamepad(const FInputActionValue& InputValue);
+
+	// Interaction
 	void PrimaryInteract();
 	UFUNCTION()
+
+	// Attributes
 	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta, float ActualDelta);
 
 	// Actions
@@ -83,4 +94,27 @@ protected:
 	void PrimaryAction();
 	void SecondaryAction();
 	void UltimateAction();
+
+	// Input
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputMappingContext* DefaultInputMapping;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_Move;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_LookMouse;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_LookGamepad;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_Jump;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_Interact;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_Sprint;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_PrimaryAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_SecondaryAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UInputAction* Input_UltimateAction;
 };
