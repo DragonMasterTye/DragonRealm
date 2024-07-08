@@ -39,6 +39,10 @@ bool UDRAction::CanStart_Implementation(AActor* Instigator)
 	{
 		return false;
 	}
+	if(!ActionComponent->ActiveGameplayTags.HasAll(RequiredTags))
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -92,9 +96,7 @@ UDRActionComponent* UDRAction::GetOwningComponent() const
 {
 	return OwningActionComponent;
 	
-	//return Cast<UDRActionComponent>(GetOuter());
-	// In Multiplayer, Unreal uses Actors as Outers, can't use Components
-	// The Above is theoretically not true as of 5.0+ (haven't tested myself yet)
+	//return Cast<UDRActionComponent>(GetOuter()); // In Multiplayer, Unreal 4.27 and lower use Actors as Outers, can't use Components
 }
 
 // Replication

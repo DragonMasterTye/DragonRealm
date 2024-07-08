@@ -36,7 +36,7 @@ public:
 	virtual UWorld* GetWorld() const override;
 
 	// Properties
-	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
+	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DR|Assignables")
 	FName ActionName;
 	UPROPERTY(EditDefaultsOnly, Category = "DR|Assignables")
 	bool bAutoStart;
@@ -46,7 +46,7 @@ public:
 
 	// Functions
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
-	bool CanStart(AActor* Instigator); // Since this is a UObject, we don't already have an Instigator so this is a safe name
+	bool CanStart(AActor* Instigator); 
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|Actions")
 	void StartAction(AActor* Instigator); 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "DR|Actions")
@@ -62,6 +62,8 @@ protected:
 	// Properties
 	UPROPERTY(Replicated)
 	UDRActionComponent* OwningActionComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
+	FGameplayTagContainer RequiredTags;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
 	FGameplayTagContainer GrantsTags;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
