@@ -57,7 +57,7 @@ void UDRActionComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	}
 }
 
-// Functions ----------------------------------------------------------
+// Action Functions
 void UDRActionComponent::AddAction(AActor* Instigator, TSubclassOf<UDRAction> ActionClass)
 {
 	if(!ActionClass)

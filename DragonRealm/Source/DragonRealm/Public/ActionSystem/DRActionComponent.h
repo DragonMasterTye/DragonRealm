@@ -9,6 +9,7 @@
 
 class UDRAction;
 class UDRActionComponent;
+// Delegate for things like OnActionStarted and OnActionStopped
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChanged, UDRActionComponent*, OwningComponent, UDRAction*, Action);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
@@ -24,7 +25,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "DR|Tags")
 	FGameplayTagContainer ActiveGameplayTags;
 
-	// Functions
+	// Action Functions
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
 	void AddAction(AActor* Instigator, TSubclassOf<UDRAction> ActionClass);
 	UFUNCTION(BlueprintCallable, Category = "DR|Actions")
@@ -47,9 +48,9 @@ protected:
 	
 	// Properties
 	UPROPERTY(BlueprintReadOnly, Replicated)
-	TArray<UDRAction*> Actions;
+	TArray<UDRAction*> Actions; // Array of actions available to this ActionComponent
 	UPROPERTY(EditAnywhere, Category = "DR|Actions")
-	TArray<TSubclassOf<UDRAction>> DefaultActions;
+	TArray<TSubclassOf<UDRAction>> DefaultActions; // Array of Actions available to this ActionComponent on GameStart
 
 	// Unreal Functions
 	virtual void BeginPlay() override;
