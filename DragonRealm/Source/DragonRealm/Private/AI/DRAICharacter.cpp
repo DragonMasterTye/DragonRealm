@@ -24,8 +24,6 @@ ADRAICharacter::ADRAICharacter()
 	GetMesh()->SetGenerateOverlapEvents(true);
 	
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
-	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
-	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
 
 	TimeOfHitParamName = "DR_TimeOfHit";
 	MaxEXP = 50;

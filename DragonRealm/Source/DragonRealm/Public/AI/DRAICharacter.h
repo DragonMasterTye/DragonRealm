@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/DRBaseCharacter.h"
 #include "GameFramework/Character.h"
 #include "DRAICharacter.generated.h"
 
@@ -12,7 +13,7 @@ class UDRAttributeComponent;
 class UPawnSensingComponent;
 
 UCLASS()
-class DRAGONREALM_API ADRAICharacter : public ACharacter
+class DRAGONREALM_API ADRAICharacter : public ADRBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -29,10 +30,6 @@ protected:
 	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UPawnSensingComponent* PawnSensingComponent;
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UDRAttributeComponent* AttributeComponent;
-	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UDRActionComponent* ActionComponent;
 
 	// Properties
 	UPROPERTY(VisibleAnywhere, Category = "DR|Effects")

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Core/DRBaseCharacter.h"
 #include "GameFramework/Character.h"
 #include "DRPlayerCharacter.generated.h"
 
@@ -18,7 +19,7 @@ class UDRInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 UCLASS()
-class DRAGONREALM_API ADRPlayerCharacter : public ACharacter
+class DRAGONREALM_API ADRPlayerCharacter : public ADRBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -30,9 +31,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// Function
+	// Utility for testing healing
 	UFUNCTION(Exec)
 	void DR_HealSelf(float Amount = 100.f);
+
+	// Getters
 	UFUNCTION()
 	UCameraComponent* GetCamera() const;
 
@@ -43,21 +46,15 @@ protected:
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UCameraComponent* CameraComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UArrowComponent* SpawnTransformArrow;
 	
 	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
     UDRInteractionComponent* InteractionComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDRAttributeComponent* AttributeComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDRActionComponent* ActionComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UDRLockOnComponent* LockOnComponent;
 	
 	//  Properties
-	UPROPERTY(EditAnywhere, Category="DR|Assignables")
+	/*UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> PrimaryAttackProjectileClass;
 	UPROPERTY(EditAnywhere, Category="DR|Assignables")
 	TSubclassOf<ADRProjectile> UltProjectileClass;
@@ -68,7 +65,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	FName AbilitySpawnSocket;
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName TimeOfHitParamName;
+	FName TimeOfHitParamName;*/
 
 	// Unreal Functions
 	virtual void PostInitializeComponents() override;
@@ -83,10 +80,11 @@ protected:
 
 	// Interaction
 	void PrimaryInteract();
-	UFUNCTION()
+	
 
 	// Attributes
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta, float ActualDelta);
+	UFUNCTION()
+	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta);
 
 	// Actions
 	void StartSprint();

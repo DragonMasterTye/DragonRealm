@@ -35,13 +35,8 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
-	SpawnTransformArrow = CreateDefaultSubobject<UArrowComponent>("SpawnTransformArrow");
-	SpawnTransformArrow->SetupAttachment(GetMesh(), AbilitySpawnSocket);
-
 	// Imaginary(Actor) Components
 	InteractionComponent = CreateDefaultSubobject<UDRInteractionComponent>("InteractionComponent");
-	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
-	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
 	LockOnComponent = CreateDefaultSubobject<UDRLockOnComponent>("LockOnComponent");
 	
 	// Setting Defaults

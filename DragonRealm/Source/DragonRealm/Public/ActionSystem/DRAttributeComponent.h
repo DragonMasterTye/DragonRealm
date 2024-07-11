@@ -6,8 +6,11 @@
 #include "Components/ActorComponent.h"
 #include "DRAttributeComponent.generated.h"
 
-class UDRAttributeComponent; // Forward declare to make the DELEGATE shut up
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnCurrentHealthChanged, AActor*, Instigator, UDRAttributeComponent*, OwningComponent, float, NewHealth, float, Delta, float, ActualDelta);
+class UDRAttributeComponent;
+// Delegate for changing Attribute values, DesiredDelta and ActualDelta provided for things like damage numbers during an overkill attack or an invulnerable state
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FiveParams(FOnAttributeChanged, AActor*, Instigator, UDRAttributeComponent*, OwningComponent, float, NewValue, float, DesiredDelta, float, ActualDelta);
+
+
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRAGONREALM_API UDRAttributeComponent : public UActorComponent
@@ -24,10 +27,10 @@ public:
 	static UDRAttributeComponent* GetAttributes(AActor* FromActor);
 	UFUNCTION(BlueprintCallable, Category = "Abilities")
 	static bool IsActorAlive(AActor* FromActor);
-	UFUNCTION(BlueprintCallable, Category = "Attributes")
-	bool ApplyHealthChange(AActor* InstigatorActor, float Delta);
-	UPROPERTY(BlueprintAssignable, Category = "Attributes")
-	FOnCurrentHealthChanged OnCurrentHealthChanged;
+	UFUNCTION(BlueprintCallable, Category = "DR|Attributes")
+	bool ApplyDamage(AActor* InstigatorActor, float Delta);
+	UPROPERTY(BlueprintAssignable, Category = "DR|Attributes")
+	FOnAttributeChanged OnHealthChanged;
 	UFUNCTION(BlueprintCallable)
 	bool IsAlive() const;
 	UFUNCTION(BlueprintCallable)
@@ -37,7 +40,7 @@ protected:
 
 	// Properties
 	UPROPERTY(BlueprintReadOnly, Replicated, Category = "Attributes")
-	float CurrentHealth;
+	float Health;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "Attributes")
 	float MaxHealth;
 

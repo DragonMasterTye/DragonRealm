@@ -12,6 +12,15 @@ class UDRActionComponent;
 // Delegate for things like OnActionStarted and OnActionStopped
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnActionStateChanged, UDRActionComponent*, OwningComponent, UDRAction*, Action);
 
+USTRUCT(BlueprintType)
+struct FDRAttribute
+{
+	GENERATED_BODY()
+
+	FDRAttribute() : BaseValue(0.f), CurrentValue(0.f){}
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class DRAGONREALM_API UDRActionComponent : public UActorComponent
 {

@@ -58,7 +58,7 @@ bool UDRAttributeComponent::Kill(AActor* InstigatorActor)
 	return ApplyHealthChange(InstigatorActor, -MaxHealth);
 }
 
-bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
+bool UDRAttributeComponent::ApplyDamage(AActor* InstigatorActor, float Delta)
 {
 	if(!GetOwner()->CanBeDamaged() && Delta < 0.f)
 	{
