@@ -13,10 +13,14 @@ class DRAGONREALM_API UDRGameplayFunctionLibrary : public UBlueprintFunctionLibr
 
 public:
 
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	// Damage
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "DR|Gameplay")
 	static bool DR_ApplyDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmount);
-
-	UFUNCTION(BlueprintCallable, Category = "Gameplay")
+	UFUNCTION(BlueprintCallable, BlueprintAuthorityOnly, Category = "DR|Gameplay")
 	static bool DR_ApplyDirectionalDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmount, const FHitResult& HitResult);
+	
+	//Healing
+	static bool Dr_ApplyHealing(AActor* Healer, AActor* TargetActor, float HealAmount);
+	
 	
 };

@@ -19,31 +19,31 @@
 // Ctor
 ADRAICharacter::ADRAICharacter()
 {
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
-	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	GetMesh()->SetGenerateOverlapEvents(true);
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
 	
 	PawnSensingComponent = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 
 	TimeOfHitParamName = "DR_TimeOfHit";
-	MaxEXP = 50;
 	MinEXP = 10;
+	MaxEXP = 50;
 	EXPToGrant = FMath::RandRange(MinEXP, MaxEXP);
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-	
 }
 
 void ADRAICharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	PawnSensingComponent->OnSeePawn.AddDynamic(this, &ADRAICharacter::OnPawnSeen);
-	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADRAICharacter::OnCurrentHealthChanged);
 }
 
-void ADRAICharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
-	float NewHealth, float Delta, float ActualDelta)
+// Health and Death
+void ADRAICharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth,
+	float DesiredDelta, float ActualDelta)
 {
+	Super::OnHealthChanged(InstigatorActor, OwningComponent, NewHealth, DesiredDelta, ActualDelta);
+
 	if(ActualDelta < 0.f)
 	{
 		// Turn on MF_DR_HitFlash

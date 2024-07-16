@@ -7,7 +7,7 @@
 
 bool UDRGameplayFunctionLibrary::DR_ApplyDamage(AActor* DamageCauser, AActor* TargetActor, float DamageAmount)
 {
-	UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributes(TargetActor);
+	UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributeComponent(TargetActor);
 	if(AttributeComponent)
 	{
 		return AttributeComponent->ApplyHealthChange(DamageCauser, -DamageAmount);
@@ -30,6 +30,16 @@ bool UDRGameplayFunctionLibrary::DR_ApplyDirectionalDamage(AActor* DamageCauser,
 			HitComponent->AddImpulseAtLocation(Direction * 300000.f, HitResult.ImpactPoint, HitResult.BoneName);
 		}
 		return true;
+	}
+	return false;
+}
+
+bool UDRGameplayFunctionLibrary::Dr_ApplyHealing(AActor* Healer, AActor* TargetActor, float HealAmount)
+{
+	UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributeComponent(TargetActor);
+	if(AttributeComponent)
+	{
+		return AttributeComponent->ApplyHealthChange(Healer, HealAmount);
 	}
 	return false;
 }

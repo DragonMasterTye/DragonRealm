@@ -63,7 +63,7 @@ void ADRExplosiveBarrel::Explode_Implementation()
 	SphereComponent->GetOverlappingActors(OverlappingActors);
 	for (auto OverlappingActor : OverlappingActors)
 	{
-		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributes(OverlappingActor);
+		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributeComponent(OverlappingActor);
 		
 		if(AttributeComponent)
 		{

@@ -68,7 +68,6 @@ protected:
 	FName TimeOfHitParamName;*/
 
 	// Unreal Functions
-	virtual void PostInitializeComponents() override;
 	virtual FVector GetPawnViewLocation() const override;
 	
 	// Movement
@@ -80,11 +79,9 @@ protected:
 
 	// Interaction
 	void PrimaryInteract();
-	
 
-	// Attributes
-	UFUNCTION()
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta);
+	// Health and Death
+	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta) override;
 
 	// Actions
 	void StartSprint();

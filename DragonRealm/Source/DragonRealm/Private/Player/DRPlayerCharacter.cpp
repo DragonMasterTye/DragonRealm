@@ -23,11 +23,6 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	GetMesh()->VisibilityBasedAnimTickOption = EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones; //@TODO update this to only tick when needed
 	
-	// Physical(Scene) Components
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
-	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Ignore);
-	GetMesh()->SetGenerateOverlapEvents(true);
-	
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(RootComponent);
 	SpringArmComponent->bUsePawnControlRotation = true;
@@ -44,14 +39,6 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	bUseControllerRotationYaw = false;
 }
 
-// Unreal Functions
-void ADRPlayerCharacter::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-
-	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADRPlayerCharacter::OnCurrentHealthChanged);
-}
-
 void ADRPlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -62,6 +49,7 @@ FVector ADRPlayerCharacter::GetPawnViewLocation() const
 	return CameraComponent->GetComponentLocation();
 }
 
+// Input
 void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -166,29 +154,7 @@ void ADRPlayerCharacter::LookGamepad(const FInputActionValue& InputValue)
 	AddControllerPitchInput(Value.Y * (LookPitchRate /** RateMultiplier*/) * GetWorld()->GetDeltaSeconds());
 }
 
-
-void ADRPlayerCharacter::OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
-                                                float NewHealth, float Delta, float ActualDelta)
-{	
-	if(ActualDelta < 0.f)
-	{
-		// Turn on MF_DR_HitFlash
-		GetMesh()->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
-
-		// Died
-		if(NewHealth <= 0.f)
-		{
-			APlayerController* PC = Cast<APlayerController>(GetController());
-			DisableInput(PC);
-
-			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-			GetCharacterMovement()->DisableMovement();
-
-			SetLifeSpan(5.f);
-		}
-	}
-}
-
+// Utility Functions
 void ADRPlayerCharacter::DR_HealSelf(float Amount /* = 100 */)
 {
 	AttributeComponent->ApplyHealthChange(this, Amount);
@@ -199,11 +165,31 @@ UCameraComponent* ADRPlayerCharacter::GetCamera() const
 	return CameraComponent;
 }
 
+// Interaction
 void ADRPlayerCharacter::PrimaryInteract()
 {
 	if(InteractionComponent)
 	{
 		InteractionComponent->PrimaryInteract();
+	}
+}
+
+// Health and Death
+void ADRPlayerCharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent,
+	float NewHealth, float DesiredDelta, float ActualDelta)
+{
+	Super::OnHealthChanged(InstigatorActor, OwningComponent, NewHealth, DesiredDelta, ActualDelta);
+
+	// Died
+	if(NewHealth <= 0.f)
+	{
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		DisableInput(PC);
+
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetCharacterMovement()->DisableMovement();
+
+		SetLifeSpan(5.f);
 	}
 }
 

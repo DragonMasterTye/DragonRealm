@@ -304,7 +304,7 @@ void ADRGameModeBase::DR_KillAllAI()
 	{
 		ADRAICharacter* Bot = *It;
 
-		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributes(Bot);
+		UDRAttributeComponent* AttributeComponent = UDRAttributeComponent::GetAttributeComponent(Bot);
 		if(ensure(AttributeComponent) && AttributeComponent->IsAlive())
 		{
 			AttributeComponent->Kill(this); // @fixme update to player that input command

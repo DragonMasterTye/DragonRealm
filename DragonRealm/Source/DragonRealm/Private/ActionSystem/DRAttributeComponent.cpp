@@ -6,20 +6,26 @@
 #include "Core/DRGameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
+#include "Net/Core/PushModel/PushModel.h"
 
-static TAutoConsoleVariable<float> CVarDamageMultiplier(TEXT("DR.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for AttributeComponent"), ECVF_Cheat);
+static TAutoConsoleVariable<float> DebugDamageMultiplier(TEXT("DR.DamageMultiplier"), 1.0f, TEXT("Global Damage Multiplier for AttributeComponent"), ECVF_Cheat);
 
 // Ctor
 UDRAttributeComponent::UDRAttributeComponent()
 {
 	SetIsReplicatedByDefault(true);
-	
-	MaxHealth = 100.f;
-	CurrentHealth = MaxHealth;
+
+	/*
+	for(EDR_Attribute Attribute : TEnumRange<EDR_Attribute>())
+	{
+		// Create a new Attribute with Base and Current values of 0.0f
+		AttributeValues[Attribute] = FDRAttribute(); 
+	}
+	static FProperty* Property = */
 }
 
-// Functions-----------------------------------------------------
-UDRAttributeComponent* UDRAttributeComponent::GetAttributes(AActor* FromActor)
+// Utility Functions 
+UDRAttributeComponent* UDRAttributeComponent::GetAttributeComponent(AActor* FromActor)
 {
 	if(FromActor)
 	{
@@ -32,7 +38,7 @@ UDRAttributeComponent* UDRAttributeComponent::GetAttributes(AActor* FromActor)
 // Returns false (DEAD) if FromActor doesn't have an AttributeComponent
 bool UDRAttributeComponent::IsActorAlive(AActor* FromActor)
 {
-	UDRAttributeComponent* AttributeComponent = GetAttributes(FromActor);
+	UDRAttributeComponent* AttributeComponent = GetAttributeComponent(FromActor);
 	if(AttributeComponent)
 	{
 		return AttributeComponent->IsAlive();
@@ -43,7 +49,7 @@ bool UDRAttributeComponent::IsActorAlive(AActor* FromActor)
 
 bool UDRAttributeComponent::IsAlive() const
 {
-	if(CurrentHealth > 0)
+	if(Health > 0)
 	{
 		return true;
 	}
@@ -58,29 +64,33 @@ bool UDRAttributeComponent::Kill(AActor* InstigatorActor)
 	return ApplyHealthChange(InstigatorActor, -MaxHealth);
 }
 
-bool UDRAttributeComponent::ApplyDamage(AActor* InstigatorActor, float Delta)
+bool UDRAttributeComponent::FullHeal(AActor* InstigatorActor)
 {
-	if(!GetOwner()->CanBeDamaged() && Delta < 0.f)
+	return ApplyHealthChange(InstigatorActor, MaxHealth);
+
+}
+
+// Negative number for Damage, Positive number for Heal
+bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Delta)
+{
+	if(!GetOwner()->CanBeDamaged())
 	{
 		return false;
 	}
 
-	if(Delta < 0.f)
-	{
-		Delta *= CVarDamageMultiplier.GetValueOnGameThread();
-	}
+	Delta *= DebugDamageMultiplier.GetValueOnGameThread();
 	
-	float OldHealth = CurrentHealth;
-	float NewHealth = FMath::Clamp(CurrentHealth + Delta, 0.0f, MaxHealth);
+	float OldHealth = Health;
+	float NewHealth = FMath::Clamp(Health + Delta, 0.0f, MaxHealth);
 	float ActualDelta = NewHealth - OldHealth;
 
 	if(GetOwner()->HasAuthority() && ActualDelta != 0.f)
 	{
-		CurrentHealth = NewHealth;
-		MulticastCurrentHealthChanged(InstigatorActor, CurrentHealth, Delta, ActualDelta);
+		Health = NewHealth;
+		MulticastHealthChanged(InstigatorActor, Health, Delta, ActualDelta);
 		
 		// Check if Killed
-		if(ActualDelta < 0.f && CurrentHealth <= 0.f)
+		if(ActualDelta < 0.f && Health <= 0.f)
 		{
 			ADRGameModeBase* GM = GetWorld()->GetAuthGameMode<ADRGameModeBase>();
 			if(GM)
@@ -93,17 +103,68 @@ bool UDRAttributeComponent::ApplyDamage(AActor* InstigatorActor, float Delta)
 	return ActualDelta != 0;
 }
 
-// Replication
-void UDRAttributeComponent::MulticastCurrentHealthChanged_Implementation(AActor* Instigator, float NewHealth,
-	float Delta, float ActualDelta)
+bool UDRAttributeComponent::ApplyEnergyChange(AActor* InstigatorActor, float Delta)
 {
-	OnCurrentHealthChanged.Broadcast(Instigator, this, NewHealth, Delta, ActualDelta);
+	float OldEnergy = Energy;
+	float NewEnergy = FMath::Clamp(Energy + Delta, 0.0f, MaxEnergy);
+	float ActualDelta = NewEnergy - OldEnergy;
+
+	if(GetOwner()->HasAuthority() && ActualDelta != 0.f)
+	{
+		Energy = NewEnergy;
+		MulticastEnergyChanged(InstigatorActor, Energy, Delta, ActualDelta);
+	}
+	
+	return ActualDelta != 0;
 }
 
+bool UDRAttributeComponent::ApplyAttributeChange(AActor* InstigatorActor, float Delta, EDR_Attribute AttributeToChange)
+{
+	if(Delta != 0.0f)
+	{
+		return false;
+	}
+
+	return false;
+}
+
+// Replication of Attributes
+// Health
+void UDRAttributeComponent::MulticastHealthChanged_Implementation(AActor* Instigator, float NewHealth,
+																	float DesiredDelta, float ActualDelta)
+{
+	OnHealthChanged.Broadcast(Instigator, this, NewHealth, DesiredDelta, ActualDelta);
+}
+void UDRAttributeComponent::MulticastMaxHealthChanged_Implementation(AActor* Instigator, float NewMaxHealth,
+																	 float DesiredDelta, float ActualDelta)
+{
+	OnHealthChanged.Broadcast(Instigator, this, NewMaxHealth, DesiredDelta, ActualDelta);
+}
+
+// Energy
+void UDRAttributeComponent::MulticastEnergyChanged_Implementation(AActor* Instigator, float NewEnergy,
+																  float DesiredDelta, float ActualDelta)
+{
+	OnHealthChanged.Broadcast(Instigator, this, NewEnergy, DesiredDelta, ActualDelta);
+}
+void UDRAttributeComponent::MulticastMaxEnergyChanged_Implementation(AActor* Instigator, float NewMaxEnergy,
+																	float DesiredDelta, float ActualDelta)
+{
+	OnHealthChanged.Broadcast(Instigator, this, NewMaxEnergy, DesiredDelta, ActualDelta);
+}
+
+// Unreal Function to mark replicated properties
 void UDRAttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(UDRAttributeComponent, CurrentHealth);
+	DOREPLIFETIME(UDRAttributeComponent, Health);
 	DOREPLIFETIME(UDRAttributeComponent, MaxHealth);
+	DOREPLIFETIME(UDRAttributeComponent, Energy);
+	DOREPLIFETIME(UDRAttributeComponent, MaxEnergy);
+
+	FDoRepLifetimeParams Params;
+	Params.bIsPushBased = true;
+	
+	//DOREPLIFETIME_WITH_PARAMS_FAST(UDRAttributeComponent, Attributes, Params);
 }

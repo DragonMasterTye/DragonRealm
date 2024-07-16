@@ -4,38 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "ActionSystem/DRAttributeComponent.h"
-#include "GameFramework/Actor.h"
+#include "Core/DRBaseCharacter.h"
 #include "DRTargetDummy.generated.h"
 
 class UDRAttributeComponent;
+
 UCLASS()
-class DRAGONREALM_API ADRTargetDummy : public AActor
+class DRAGONREALM_API ADRTargetDummy : public ADRBaseCharacter
 {
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
 	ADRTargetDummy();
 
 protected:
 
-	// Physical(Scene) Components
-	UPROPERTY(VisibleAnywhere)
-	USkeletalMeshComponent* Mesh;
-
-	// Imaginary(Actor) Components
-	UPROPERTY(VisibleAnywhere)
-	UDRAttributeComponent* AttributeComponent;
-
-	// Properties
-	UPROPERTY(VisibleAnywhere, Category = "Effects")
+	// Used for Hit Flash Effect
+	UPROPERTY(VisibleAnywhere, Category = "DR|Effects")
 	FName TimeOfHitParamName;
 
-	// Unreal Functions
-	virtual void PostInitializeComponents() override;
-
-	// Functions
-	UFUNCTION(BlueprintNativeEvent)
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta, float ActualDelta);
+	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta) override;
 
 };

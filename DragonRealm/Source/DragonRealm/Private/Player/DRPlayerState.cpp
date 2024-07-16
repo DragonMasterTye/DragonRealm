@@ -3,7 +3,18 @@
 
 #include "Player/DRPlayerState.h"
 
+#include "AbilitySystem/DRAbilitySystemComponent.h"
 #include "Core/DRSaveGame.h"
+
+ADRPlayerState::ADRPlayerState()
+{
+	DRASC = CreateDefaultSubobject<UDRAbilitySystemComponent>("AbilitySystemComponent");
+}
+
+UAbilitySystemComponent* ADRPlayerState::GetAbilitySystemComponent() const
+{
+	return DRASC;
+}
 
 int32 ADRPlayerState::GetEXP() const
 {

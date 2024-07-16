@@ -50,8 +50,9 @@ protected:
 	// Functions
 	UFUNCTION(BlueprintNativeEvent)
 	void OnPawnSeen(APawn* Pawn);
-	UFUNCTION()
-	void OnCurrentHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float Delta, float ActualDelta);
+
+	// Health and Death
+	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta) override;
 
 	// Utilities
 	void SetTargetActor(AActor* NewTarget);

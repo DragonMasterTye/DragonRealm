@@ -5,34 +5,23 @@
 
 #include "ActionSystem/DRAttributeComponent.h"
 
-// Sets default values
 ADRTargetDummy::ADRTargetDummy()
 {
-	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>("Mesh");
-	RootComponent = Mesh;
-
-	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
-
 	TimeOfHitParamName = "DR_TimeOfHit";
 }
 
-
-void ADRTargetDummy::PostInitializeComponents()
+void ADRTargetDummy::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth,
+	float DesiredDelta, float ActualDelta)
 {
-	Super::PostInitializeComponents();
+	Super::OnHealthChanged(InstigatorActor, OwningComponent, NewHealth, DesiredDelta, ActualDelta);
 
-	AttributeComponent->OnCurrentHealthChanged.AddDynamic(this, &ADRTargetDummy::OnCurrentHealthChanged);
-}
-
-void ADRTargetDummy::OnCurrentHealthChanged_Implementation(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth,
-                                             float Delta, float ActualDelta)
-{
-	if(ensureAlways(Mesh))
+	if(ActualDelta < 0.0f)
 	{
-		if(Delta < 0)
+		GetMesh()->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
+
+		if(NewHealth <= 0.0f)
 		{
-			// Turn on MF_DR_HitFlash
-			Mesh->SetScalarParameterValueOnMaterials(TimeOfHitParamName, GetWorld()->TimeSeconds);
+			AttributeComponent->FullHeal(InstigatorActor);
 		}
 	}
 }
