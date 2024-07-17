@@ -20,9 +20,11 @@ class DRAGONREALM_API UDRBaseAttributeSet : public UAttributeSet
 
 public:
 	
-	ATTRIBUTE_ACCESSORS(UDRBaseAttributeSet, Health)
+	//ATTRIBUTE_ACCESSORS(UDRBaseAttributeSet, Health)
+
+	UDRBaseAttributeSet();
 
 protected:
-	UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_Health)
-	FGameplayAttributeData Health;
+	//UPROPERTY(BlueprintReadOnly, Category = "Health", ReplicatedUsing = OnRep_Health)
+	//FGameplayAttributeData Health;
 };

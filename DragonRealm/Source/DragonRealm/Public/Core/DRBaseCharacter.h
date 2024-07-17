@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "DRBaseCharacter.generated.h"
 
+class UDRCharacterMovementComponent;
 //class UDRAbilitySystemComponent;
 class UDRAttributeComponent;
 class UDRActionComponent;
@@ -17,7 +18,10 @@ class DRAGONREALM_API ADRBaseCharacter : public ACharacter, public IAbilitySyste
 
 public:
 	// Ctor
-	ADRBaseCharacter();
+	ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+
+	UFUNCTION(BlueprintPure)
+	FORCEINLINE UDRCharacterMovementComponent* GetDRCharacterMovement() const { return DRCharacterMovementComponent; }
 
 protected:
 	// Component Responsible for Attributes such as Health, Mana, and EXP and their replication
@@ -26,6 +30,9 @@ protected:
 	// Component Responsible for all the use and replication of Actions
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
 	UDRActionComponent* ActionComponent;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Movement")
+	UDRCharacterMovementComponent* DRCharacterMovementComponent;
 
 	// Unreal Overrides
 	virtual void PostInitializeComponents() override;

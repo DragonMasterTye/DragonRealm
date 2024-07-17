@@ -3,7 +3,7 @@
 
 #include "AbilitySystem/AttributeSets/DRAttributeObject.h"
 
-UDRAttributeObject::UDRAttributeObject(FName Name)
+UDRAttributeObject::UDRAttributeObject()
 {
-	AttributeName = Name;
+	//AttributeName = Name;
 }

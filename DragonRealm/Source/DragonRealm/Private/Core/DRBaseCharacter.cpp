@@ -7,13 +7,18 @@
 #include "ActionSystem/DRActionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Core/DRCharacterMovementComponent.h"
 
 // Ctor
-ADRBaseCharacter::ADRBaseCharacter()
-{
+ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UDRCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+{	
 	PrimaryActorTick.bCanEverTick = false;
 
 	GetMesh()->SetGenerateOverlapEvents(true);
+
+	DRCharacterMovementComponent = Cast<UDRCharacterMovementComponent>(GetCharacterMovement());
+	DRCharacterMovementComponent->SetIsReplicated(true);
 	
 	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
 	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");

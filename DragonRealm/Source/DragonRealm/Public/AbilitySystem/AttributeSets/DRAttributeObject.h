@@ -22,9 +22,9 @@ class DRAGONREALM_API UDRAttributeObject : public UObject
 	
 protected:
 	
-	UPROPERTY(BlueprintReadOnly, Category = "DR|Attribute", ReplicatedUsing = "OnRep_Attribute")
-	FGameplayAttributeData AttributeData;
+	//UPROPERTY(BlueprintReadOnly, Category = "DR|Attribute", ReplicatedUsing = "OnRep_Attribute")
+	//FGameplayAttributeData AttributeData;
 
-	UFUNCTION()
-	virtual void OnRep_Attribute(const FGameplayAttributeData& OldValue);
+	//UFUNCTION()
+	//virtual void OnRep_Attribute(const FGameplayAttributeData& OldValue);
 };
