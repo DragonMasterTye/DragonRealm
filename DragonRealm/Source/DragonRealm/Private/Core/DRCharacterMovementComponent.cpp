@@ -17,6 +17,10 @@ bool UDRCharacterMovementComponent::FSavedMove_DRCharacter::CanCombineWith(const
 	{
 		return false;
 	}
+	if(Saved_bWallIsOnRight != NewDRMove->Saved_bWallIsOnRight)
+	{
+		return false;
+	}
 	
 	return FSavedMove_Character::CanCombineWith(NewMove, InCharacter, MaxDelta);
 }
@@ -27,6 +31,7 @@ void UDRCharacterMovementComponent::FSavedMove_DRCharacter::Clear()
 	FSavedMove_Character::Clear();
 
 	Saved_bWantsToSprint = 0;
+	Saved_bWallIsOnRight = 0;
 }
 
 // 8 Flags for important movement mode switches (jump, sprint, fly...)
@@ -49,6 +54,7 @@ void UDRCharacterMovementComponent::FSavedMove_DRCharacter::SetMoveFor(ACharacte
 	const UDRCharacterMovementComponent* CharacterMovement = Cast<UDRCharacterMovementComponent>(C->GetCharacterMovement());
 
 	Saved_bWantsToSprint = CharacterMovement->Safe_bWantsToSprint;
+	Saved_bWallIsOnRight = CharacterMovement->Safe_bWallIsOnRight;
 }
 
 // Sets Safe variables using the received Saved variables (Received Snapshot is being applied to actual variables)
@@ -59,6 +65,7 @@ void UDRCharacterMovementComponent::FSavedMove_DRCharacter::PrepMoveFor(ACharact
 	UDRCharacterMovementComponent* CharacterMovement = Cast<UDRCharacterMovementComponent>(C->GetCharacterMovement());
 
 	CharacterMovement->Safe_bWantsToSprint = Saved_bWantsToSprint;
+	CharacterMovement->Safe_bWallIsOnRight = Saved_bWallIsOnRight;
 }
 
 #pragma endregion
@@ -105,6 +112,21 @@ FNetworkPredictionData_Client* UDRCharacterMovementComponent::GetPredictionData_
 		MutableThis->ClientPredictionData->NoSmoothNetUpdateDist = 140.f; // These Values only affect Simulated Proxies (Non-Owned Clients)
 	}
 	return ClientPredictionData;
+}
+
+bool UDRCharacterMovementComponent::CanAttemptJump() const
+{
+	return Super::CanAttemptJump() || IsWallRunning();
+}
+
+bool UDRCharacterMovementComponent::DoJump(bool bReplayingMoves)
+{
+	return Super::DoJump(bReplayingMoves);
+}
+
+bool UDRCharacterMovementComponent::IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const
+{
+	return MovementMode == MOVE_Custom && CustomMovementMode == InCustomMovementMode;
 }
 
 // Decompress Flags to update movement state
@@ -165,6 +187,14 @@ void UDRCharacterMovementComponent::CrouchPressed()
 void UDRCharacterMovementComponent::CrouchReleased()
 {
 	bWantsToCrouch = false;	
+}
+
+bool UDRCharacterMovementComponent::TryWallRun()
+{
+}
+
+void UDRCharacterMovementComponent::PhysWallRun(float deltaTime, int32 Iterations)
+{
 }
 
 //-------------------------------------------MOVEMENT FUNCTIONS-------------------------------------------

@@ -37,7 +37,9 @@ public:
 
 	// Getters
 	UFUNCTION()
-	UCameraComponent* GetCamera() const;
+	FORCEINLINE UCameraComponent* GetCamera() const { return CameraComponent; };
+	UFUNCTION()
+	FORCEINLINE USpringArmComponent* GetSpringArm() const { return SpringArmComponent; };
 
 protected:
 
