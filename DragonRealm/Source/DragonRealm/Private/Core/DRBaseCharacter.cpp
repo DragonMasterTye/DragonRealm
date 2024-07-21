@@ -25,6 +25,35 @@ ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent = CreateDefaultSubobject<UDRAbilitySystemComponent>("DRAbilitySystemComponent");
 }
 
+FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
+{
+	FCollisionQueryParams Params;
+
+	TArray<AActor*> CharacterChildren;
+	GetAllChildActors(CharacterChildren);
+	Params.AddIgnoredActors(CharacterChildren);
+	Params.AddIgnoredActor(this);
+
+	return Params;
+}
+
+void ADRBaseCharacter::Jump()
+{
+	bPressedDRJump = true;
+
+	Super::Jump();
+	
+	bPressedJump = false;
+
+	UE_LOG(LogTemp, Warning, TEXT("Jump isserver:%d"), HasAuthority())
+}
+
+void ADRBaseCharacter::StopJumping()
+{
+	bPressedDRJump = false;
+	Super::StopJumping();
+}
+
 UAbilitySystemComponent* ADRBaseCharacter::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent.Get();

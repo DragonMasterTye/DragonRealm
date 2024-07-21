@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "DRCharacterMovementComponent.generated.h"
 
+class ADRBaseCharacter;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashStartDelegate);
 
 UENUM(BlueprintType)
@@ -39,10 +40,14 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 			FLAG_Custom_3		= 0x80,
 		};
 
-		typedef FSavedMove_Character Super;
+		FSavedMove_DRCharacter();
 
 		uint8 Saved_bWantsToSprint:1;
+		uint8 Saved_bPressedDRJump:1;
 		uint8 Saved_bWallIsOnRight:1;
+
+		uint8 Saved_bHadAnimRootMotion:1;
+		uint8 Saved_bTransitionFinished:1;
 
 		virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const override;
 		virtual void Clear() override;
@@ -77,10 +82,20 @@ public:
 
 	// Getters
 	virtual FNetworkPredictionData_Client* GetPredictionData_Client() const override;
+	virtual bool IsMovingOnGround() const override;
+	virtual bool CanCrouchInCurrentState() const override;
+	virtual float GetMaxSpeed() const override;
+	virtual float GetMaxBrakingDeceleration() const override;
+	virtual void UpdateCharacterStateBeforeMovement(float DeltaSeconds) override;
+	virtual void UpdateCharacterStateAfterMovement(float DeltaSeconds) override;
 
 	// Overriden Default Functions
 	virtual bool CanAttemptJump() const override;
 	virtual bool DoJump(bool bReplayingMoves) override;
+
+	// Custom Character that this CCMC is attached to
+	UPROPERTY(Transient)
+	ADRBaseCharacter* DROwningCharacter;
 
 	// Flags
 	bool Safe_bWantsToSprint;
@@ -94,9 +109,17 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	float Walk_MaxWalkSpeed;
 
+	// Used for blending client back to correct location per Authority
+	float AccumulatedClientLocationError=0.f;
+	int TickCount=0;
+	int CorrectionCount=0;
+	int TotalBitsSent=0;
+
 	// CCMC Helpers
 	UFUNCTION(BlueprintPure)
 	bool IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const;
+	UFUNCTION(BlueprintPure)
+	bool IsMovementMode(EMovementMode InMovementMode) const;
 
 	// Wall Run Checks
 	UFUNCTION(BlueprintPure)
@@ -136,9 +159,22 @@ public:
 //-------------------------------------------MOVEMENT FUNCTIONS-------------------------------------------
 	
 protected:
-	
+
+	virtual void InitializeComponent() override;
 	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
 	virtual void OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity) override;
+	virtual void OnClientCorrectionReceived(FNetworkPredictionData_Client_Character& ClientData, float TimeStamp,
+		FVector NewLocation, FVector NewVelocity, UPrimitiveComponent* NewBase, FName NewBaseBoneName, bool bHasBase,
+		bool bBaseRelativePosition, uint8 ServerMovementMode, FVector ServerGravityDirection) override;
+	virtual void PhysCustom(float deltaTime, int32 Iterations) override;
+	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
+	virtual bool ServerCheckClientError(float ClientTimeStamp, float DeltaTime, const FVector& Accel,
+		const FVector& ClientWorldLocation, const FVector& RelativeClientLocation,
+		UPrimitiveComponent* ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode) override;
+	virtual void CallServerMovePacked(const FSavedMove_Character* NewMove, const FSavedMove_Character* PendingMove,
+		const FSavedMove_Character* OldMove) override;
+
+	FNetBitWriter DRServerMoveBitWriter;
 
 #pragma endregion
 // CCMC

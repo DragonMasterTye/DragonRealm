@@ -23,6 +23,12 @@ public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UDRCharacterMovementComponent* GetDRCharacterMovement() const { return DRCharacterMovementComponent; }
 
+	FCollisionQueryParams GetIgnoreCharacterParams() const;
+
+	bool bPressedDRJump;
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+	
 protected:
 	// Component Responsible for Attributes such as Health, Mana, and EXP and their replication
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
