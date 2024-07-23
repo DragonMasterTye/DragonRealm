@@ -14,7 +14,6 @@ enum ECustomMovementMode
 {
 	CMOVE_None			UMETA(Hidden),
 	CMOVE_Slide			UMETA(DisplayName = "Slide"),
-	CMOVE_Prone			UMETA(DisplayName = "Prone"),
 	CMOVE_WallRun		UMETA(DisplayName = "Wall Run"),
 	CMOVE_Hang			UMETA(DisplayName = "Hang"),
 	CMOVE_Climb			UMETA(DisplayName = "Climb"),
@@ -27,6 +26,8 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 {
 	GENERATED_BODY()
 
+// SavedMove
+#pragma region SavedMove
 	class FSavedMove_DR : public FSavedMove_Character
 	{
 	public:
@@ -40,17 +41,17 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 		
 		// Flags
 		uint8 Saved_bPressedDRJump:1;
+		uint8 Saved_bPrevWantsToCrouch:1;
+		
 		uint8 Saved_bWantsToSprint:1;
 		uint8 Saved_bWantsToDash:1;
 
-		// Other Variables
 		uint8 Saved_bHadAnimRootMotion:1;
 		uint8 Saved_bTransitionFinished:1;
-		uint8 Saved_bPrevWantsToCrouch:1;
-		uint8 Saved_bWantsToProne:1;
+		
 		uint8 Saved_bWallRunIsRight:1;
 
-
+		// Ctor
 		FSavedMove_DR();
 
 		virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const override;
@@ -59,7 +60,11 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 		virtual void SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData) override;
 		virtual void PrepMoveFor(ACharacter* C) override;
 	};
+#pragma endregion
+// SavedMove	
 
+// NetworkData
+#pragma region ClientPredictionNetworkData
 	class FNetworkPredictionData_Client_DR : public FNetworkPredictionData_Client_Character
 	{
 	public:
@@ -69,51 +74,49 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 
 		virtual FSavedMovePtr AllocateNewMove() override;
 	};
+#pragma endregion 
+// NetworkData
 
-	// Parameters
-		UPROPERTY(EditDefaultsOnly) float MaxSprintSpeed=750.f;
+// CCMC
+#pragma region CustomCharacterMovementComponent
+public:
+	// Sprint
+	UPROPERTY(EditDefaultsOnly) float MaxSprintSpeed = 750.0f;
 
-		// Slide
-		UPROPERTY(EditDefaultsOnly) float MinSlideSpeed=400.f;
-		UPROPERTY(EditDefaultsOnly) float MaxSlideSpeed=400.f;
-		UPROPERTY(EditDefaultsOnly) float SlideEnterImpulse=400.f;
-		UPROPERTY(EditDefaultsOnly) float SlideGravityForce=4000.f;
-		UPROPERTY(EditDefaultsOnly) float SlideFrictionFactor=.06f;
-		UPROPERTY(EditDefaultsOnly) float BrakingDecelerationSliding=1000.f;
+	// Slide
+	UPROPERTY(EditDefaultsOnly) float MinSlideSpeed = 400.0f;
+	UPROPERTY(EditDefaultsOnly) float MaxSlideSpeed = 400.0f;
+	UPROPERTY(EditDefaultsOnly) float SlideEnterImpulse = 400.0f;
+	UPROPERTY(EditDefaultsOnly) float SlideGravityForce = 4000.0f;
+	UPROPERTY(EditDefaultsOnly) float SlideFrictionFactor = 0.06f;
+	UPROPERTY(EditDefaultsOnly) float BrakingDecelerationSliding = 1000.0f;
 
-		// Prone
-		UPROPERTY(EditDefaultsOnly) float ProneEnterHoldDuration=.2f;
-		UPROPERTY(EditDefaultsOnly) float ProneSlideEnterImpulse=300.f;
-		UPROPERTY(EditDefaultsOnly) float MaxProneSpeed=300.f;
-		UPROPERTY(EditDefaultsOnly) float BrakingDecelerationProning=2500.f;
+	// Dash
+	UPROPERTY(EditDefaultsOnly) float DashCooldownDuration = 1.0f;
+	UPROPERTY(EditDefaultsOnly) float AuthDashCooldownDuration = 0.9f;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* DashMontage;
 
-		// Dash
-		UPROPERTY(EditDefaultsOnly) float DashCooldownDuration=1.f;
-		UPROPERTY(EditDefaultsOnly) float AuthDashCooldownDuration=.9f;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* DashMontage;
-
-		// Mantle
-		UPROPERTY(EditDefaultsOnly) float MantleMaxDistance = 200;
-    	UPROPERTY(EditDefaultsOnly) float MantleReachHeight = 50;
-    	UPROPERTY(EditDefaultsOnly) float MinMantleDepth = 30;
-    	UPROPERTY(EditDefaultsOnly) float MantleMinWallSteepnessAngle = 75;
-    	UPROPERTY(EditDefaultsOnly) float MantleMaxSurfaceAngle = 40;
-    	UPROPERTY(EditDefaultsOnly) float MantleMaxAlignmentAngle = 45;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* TallMantleMontage;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* TransitionTallMantleMontage;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* ProxyTallMantleMontage;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* ShortMantleMontage;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* TransitionShortMantleMontage;
-		UPROPERTY(EditDefaultsOnly) UAnimMontage* ProxyShortMantleMontage;
-
-
+	// Mantle
+	UPROPERTY(EditDefaultsOnly) float MantleMaxDistance = 200;
+    UPROPERTY(EditDefaultsOnly) float MantleReachHeight = 50;
+    UPROPERTY(EditDefaultsOnly) float MinMantleDepth = 30;
+    UPROPERTY(EditDefaultsOnly) float MantleMinWallSteepnessAngle = 75;
+    UPROPERTY(EditDefaultsOnly) float MantleMaxSurfaceAngle = 40;
+    UPROPERTY(EditDefaultsOnly) float MantleMaxAlignmentAngle = 45;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* TallMantleMontage;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* TransitionTallMantleMontage;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* ProxyTallMantleMontage;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* ShortMantleMontage;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* TransitionShortMantleMontage;
+	UPROPERTY(EditDefaultsOnly) UAnimMontage* ProxyShortMantleMontage;
+	
 	// Wall Run
-	UPROPERTY(EditDefaultsOnly) float MinWallRunSpeed=200.f;
-	UPROPERTY(EditDefaultsOnly) float MaxWallRunSpeed=800.f;
-	UPROPERTY(EditDefaultsOnly) float MaxVerticalWallRunSpeed=200.f;
-	UPROPERTY(EditDefaultsOnly) float WallRunPullAwayAngle=75;
+	UPROPERTY(EditDefaultsOnly) float MinWallRunSpeed = 200.f;
+	UPROPERTY(EditDefaultsOnly) float MaxWallRunSpeed = 800.f;
+	UPROPERTY(EditDefaultsOnly) float MaxVerticalWallRunSpeed = 200.f;
+	UPROPERTY(EditDefaultsOnly) float WallRunPullAwayAngle = 75;
 	UPROPERTY(EditDefaultsOnly) float WallAttractionForce = 200.f;
-	UPROPERTY(EditDefaultsOnly) float MinWallRunHeight=50.f;
+	UPROPERTY(EditDefaultsOnly) float MinWallRunHeight = 50.f;
 	UPROPERTY(EditDefaultsOnly) UCurveFloat* WallRunGravityScaleCurve;
 	UPROPERTY(EditDefaultsOnly) float WallJumpOffForce = 300.f;
 
@@ -126,59 +129,52 @@ class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementC
 	UPROPERTY(EditDefaultsOnly) float MaxClimbSpeed = 300.f;
 	UPROPERTY(EditDefaultsOnly) float BrakingDecelerationClimbing = 1000.f;
 	UPROPERTY(EditDefaultsOnly) float ClimbReachDistance = 200.f;
-
 	
 	// Transient
-		UPROPERTY(Transient) ADRBaseCharacter* DRCharacterOwner;
+	UPROPERTY(Transient) ADRBaseCharacter* DRCharacterOwner;
 
-		// Flags
-		bool Safe_bWantsToSprint;
-		bool Safe_bWantsToProne;
-		bool Safe_bWantsToDash;
+	// Flags
+	bool Safe_bWantsToSprint;
+	bool Safe_bWantsToDash;
 
-		bool Safe_bHadAnimRootMotion;
-		bool Safe_bPrevWantsToCrouch;
+	bool Safe_bHadAnimRootMotion;
+	bool Safe_bPrevWantsToCrouch;
 
-		float DashStartTime;
-		FTimerHandle TimerHandle_EnterProne;
-		FTimerHandle TimerHandle_DashCooldown;
+	float DashStartTime;
+	FTimerHandle TimerHandle_DashCooldown;
 
-		bool Safe_bTransitionFinished;
-		TSharedPtr<FRootMotionSource_MoveToForce> TransitionRMS;
-		FString TransitionName;
-		UPROPERTY(Transient) UAnimMontage* TransitionQueuedMontage;
-		float TransitionQueuedMontageSpeed;
-		int TransitionRMS_ID;
+	bool Safe_bTransitionFinished;
+	TSharedPtr<FRootMotionSource_MoveToForce> TransitionRMS;
+	FString TransitionName;
+	UPROPERTY(Transient) UAnimMontage* TransitionQueuedMontage;
+	float TransitionQueuedMontageSpeed;
+	int TransitionRMS_ID;
 
-		bool Safe_bWallRunIsRight;
+	bool Safe_bWallRunIsRight;
 
-	float AccumulatedClientLocationError=0.f;
-
-
-	int TickCount=0;
-	int CorrectionCount=0;
-	int TotalBitsSent=0;
+	// Client Prediction Correction
+	float AccumulatedClientLocationError = 0.0f;
+	int TickCount = 0;
+	int CorrectionCount = 0;
+	int TotalBitsSent = 0;
 	
-
 	// Replication
-		UPROPERTY(ReplicatedUsing=OnRep_Dash) bool Proxy_bDash;
+	UPROPERTY(ReplicatedUsing=OnRep_Dash) bool Proxy_bDash;
 
-		UPROPERTY(ReplicatedUsing=OnRep_ShortMantle) bool Proxy_bShortMantle;
-		UPROPERTY(ReplicatedUsing=OnRep_TallMantle) bool Proxy_bTallMantle;
+	UPROPERTY(ReplicatedUsing=OnRep_ShortMantle) bool Proxy_bShortMantle;
+	UPROPERTY(ReplicatedUsing=OnRep_TallMantle) bool Proxy_bTallMantle;
 
 	// Delegates
-public:
 	UPROPERTY(BlueprintAssignable) FDashStartDelegate DashStartDelegate;
 
-public:
+	// Ctor
 	UDRCharacterMovementComponent();
 
-	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	// Actor Component
 protected:
 	virtual void InitializeComponent() override;
-	// Character Movement Component
+
 public:
 	virtual FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 	virtual bool IsMovingOnGround() const override;
@@ -206,49 +202,33 @@ protected:
 	
 	virtual void CallServerMovePacked(const FSavedMove_Character* NewMove, const FSavedMove_Character* PendingMove, const FSavedMove_Character* OldMove) override;
 	
-	// Slide
+
 private:
+	// Slide
 	void EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode);
 	void ExitSlide();
 	bool CanSlide() const;
 	void PhysSlide(float deltaTime, int32 Iterations);
-
-	// Prone
-private:
-	void OnTryEnterProne() { Safe_bWantsToProne = true; }
-	UFUNCTION(Server, Reliable) void Server_EnterProne();
 	
-	void EnterProne(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode);
-	void ExitProne();
-	bool CanProne() const;
-	void PhysProne(float deltaTime, int32 Iterations);
-
 	// Dash
-private:
 	void OnDashCooldownFinished();
-
 	bool CanDash() const;
 	void PerformDash();
 
 	// Vault
-private:
 	bool TryMantle();
 	FVector GetMantleStartLocation(FHitResult FrontHit, FHitResult SurfaceHit, bool bTallMantle) const;
 
 	// Wall Run
-private:
 	bool TryWallRun();
 	void PhysWallRun(float deltaTime, int32 Iterations);
 
-// Climb
-private:
+	// Climb
 	bool TryHang();
-
 	bool TryClimb();
 	void PhysClimb(float deltaTime, int32 Iterations);
 	
 	// Helpers
-private:
 	bool IsServer() const;
 	float CapR() const;
 	float CapHH() const;
@@ -276,7 +256,6 @@ public:
 	UFUNCTION(BlueprintPure) bool IsClimbing() const { return IsCustomMovementMode(CMOVE_Climb); }
 
 	// Proxy Replication
-public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 private:
 	UFUNCTION() void OnRep_Dash();
