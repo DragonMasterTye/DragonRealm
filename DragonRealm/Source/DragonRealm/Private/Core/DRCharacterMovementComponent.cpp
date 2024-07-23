@@ -979,7 +979,7 @@ bool UDRCharacterMovementComponent::TryWallRun()
 	
 	// Left Cast
 	GetWorld()->LineTraceSingleByProfile(WallHit, Start, LeftEnd, "BlockAll", Params);
-	if (WallHit.IsValidBlockingHit() && (Velocity | WallHit.Normal) < 0)
+	if (WallHit.IsValidBlockingHit() && (Velocity | WallHit.Normal) < 30)
 	{
 		Safe_bWallRunIsRight = false;
 	}
@@ -987,7 +987,7 @@ bool UDRCharacterMovementComponent::TryWallRun()
 	else
 	{
 		GetWorld()->LineTraceSingleByProfile(WallHit, Start, RightEnd, "BlockAll", Params);
-		if (WallHit.IsValidBlockingHit() && (Velocity | WallHit.Normal) < 0)
+		if (WallHit.IsValidBlockingHit() && (Velocity | WallHit.Normal) < 30)
 		{
 			Safe_bWallRunIsRight = true;
 		}
