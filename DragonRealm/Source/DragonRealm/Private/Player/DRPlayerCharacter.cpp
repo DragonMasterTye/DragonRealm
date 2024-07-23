@@ -68,7 +68,8 @@ void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	// Move, Jump, Interact
 	EnhancedInputComponent->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::Move);
-	EnhancedInputComponent->BindAction(Input_Jump, ETriggerEvent::Triggered, this, &ADRBaseCharacter::Jump);
+	EnhancedInputComponent->BindAction(Input_Jump, ETriggerEvent::Started, this, &ADRBaseCharacter::Jump);
+	EnhancedInputComponent->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ADRBaseCharacter::StopJumping);
 	EnhancedInputComponent->BindAction(Input_Interact, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryInteract);
 
 	// Sprint
