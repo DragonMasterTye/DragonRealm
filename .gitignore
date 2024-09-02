@@ -1,10 +1,13 @@
+# The '#' character at the beginning of a line makes that line into a comment
+
+# ignore file instructions:
 # character.png		|	Ignores all files that are named “character.png”
 # /character.png	|	Ignores all files in the project root that are named “character.png”
 # *.png 		|	Ignores all PNG files
 # Build/		|	Ignores the Build folder, only if it’s in the root of your project
 # */Build		|	Ignores the Build folder only, if it’s in a subfolder
-# **/Build		|	Ignores the Build folder, regardless where it is in the project. 
-#			|	This is useful when your Git repository has a subfolder (e.g. called Unreal) where your Unreal Engine project is located.
+# **/Build		|	Ignores the Build folder, regardless of where it is in the project. 
+#			|	This is useful when your repository has a subfolder (e.g. called Unreal) where your Unreal Engine project is located.
 # Build/*/file.txt	|	Ignores the file.txt if it’s inside a subfolder of the build folder. E.g. Build/something/file.txt
 # !*.png		|	Include all PNG files, even if they have been ignored before
 # !Build/file.txt	|	Include file.txt, even if the Build folder is ignored
