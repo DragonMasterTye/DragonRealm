@@ -193,7 +193,7 @@ void ADRGameModeBase::SpawnBotTimerElapsed()
 {
 	if(!CVarSpawnBots.GetValueOnGameThread())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Bot spawning diasbled via CVAR: DR.SpawnBots"));
+		//UE_LOG(LogTemp, Error, TEXT("Bot spawning diasbled via CVAR: DR.SpawnBots"));
 		return;
 	}
 	int32 NrOfAliveBots = 0;
