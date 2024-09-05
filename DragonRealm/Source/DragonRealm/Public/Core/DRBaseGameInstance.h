@@ -4,14 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-#include "DRGameInstanceBase.generated.h"
+#include "DRBaseGameInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DRAGONREALM_API UDRGameInstanceBase : public UGameInstance
+class DRAGONREALM_API UDRBaseGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+	
+public:
+
+	virtual void Init() override;
 	
 };
