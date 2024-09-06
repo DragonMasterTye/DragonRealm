@@ -1,7 +1,7 @@
 // Copyright Landon Morrison 2024
 
 
-#include "Core/DRLockOnComponent.h"
+#include "Core/DRBaseLockOnComponent.h"
 
 #include "KismetTraceUtils.h"
 #include "Camera/CameraComponent.h"
@@ -10,7 +10,7 @@
 #include "Player/DRPlayerCharacter.h"
 
 // Ctor
-UDRLockOnComponent::UDRLockOnComponent()
+UDRBaseLockOnComponent::UDRBaseLockOnComponent()
 {
 	TicksPerSecond = 30.f;
 	ConeTraceDistance = 1000.f;
@@ -21,7 +21,7 @@ UDRLockOnComponent::UDRLockOnComponent()
 }
 
 // Unreal Functions
-void UDRLockOnComponent::BeginPlay()
+void UDRBaseLockOnComponent::BeginPlay()
 {
 	Super::BeginPlay();
 								// FPS * Seconds
@@ -31,12 +31,12 @@ void UDRLockOnComponent::BeginPlay()
 	if(Owner) // Only run our "tick" function if we have a DRPlayerCharacter as owner
 	{
 		// Start "tick" timer
-		//GetWorld()->GetTimerManager().SetTimer(TimerHandle_SearchForTargetables, this, &UDRLockOnComponent::SearchForTargetables, Rate, true);
+		//GetWorld()->GetTimerManager().SetTimer(TimerHandle_SearchForTargetables, this, &UDRBaseLockOnComponent::SearchForTargetables, Rate, true);
 	}
 }	
 
 // Functions ---------------------------------
-void UDRLockOnComponent::SearchForTargetables()
+void UDRBaseLockOnComponent::SearchForTargetables()
 {
 	// There is potential for improving efficiency by using the method from PawnSensingComponent
 	// to access all *Relevant* Pawns and then see if they are within the bounds, @todo try this
@@ -136,12 +136,12 @@ void UDRLockOnComponent::SearchForTargetables()
 	// Highlight Targetable
 }
 
-void UDRLockOnComponent::LockOn()
+void UDRBaseLockOnComponent::LockOn()
 {
 	// Set Camera to follow Target (with a little wiggle room)
 }
 
-void UDRLockOnComponent::LockOff()
+void UDRBaseLockOnComponent::LockOff()
 {
 	// Free Camera
 

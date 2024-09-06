@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Core/DRInteractionComponent.h"
+#include "Core/DRBaseInteractionComponent.h"
 #include "Core/DRGameplayInterface.h"
 #include "World/DRWorldUserWidget.h"
 #include "DrawDebugHelpers.h"
@@ -10,7 +10,7 @@
 static TAutoConsoleVariable<bool> CVarDebugDrawInteraction(TEXT("DR.DebugDrawInteraction"), false, TEXT("Enable Debug lines for InteractionComponent"), ECVF_Cheat);
 
 // Ctor
-UDRInteractionComponent::UDRInteractionComponent()
+UDRBaseInteractionComponent::UDRBaseInteractionComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
@@ -20,7 +20,7 @@ UDRInteractionComponent::UDRInteractionComponent()
 }
 
 // Unreal Functions
-void UDRInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UDRBaseInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -31,18 +31,18 @@ void UDRInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	}
 }
 
-void UDRInteractionComponent::BeginPlay()
+void UDRBaseInteractionComponent::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
 // Functions
-void UDRInteractionComponent::PrimaryInteract()
+void UDRBaseInteractionComponent::PrimaryInteract()
 {
 	ServerInteract(FocusedActor);
 }
 
-void UDRInteractionComponent::FindBestInteractable()
+void UDRBaseInteractionComponent::FindBestInteractable()
 {
 	bool bDebugDraw = CVarDebugDrawInteraction.GetValueOnGameThread();
 	
@@ -119,7 +119,7 @@ void UDRInteractionComponent::FindBestInteractable()
 	}
 }
 
-void UDRInteractionComponent::ServerInteract_Implementation(AActor* InFocusedActor)
+void UDRBaseInteractionComponent::ServerInteract_Implementation(AActor* InFocusedActor)
 {
 	if(InFocusedActor == nullptr)
 	{

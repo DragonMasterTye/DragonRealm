@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DRLockOnComponent.generated.h"
+#include "DRBaseLockOnComponent.generated.h"
 
 
 class ADRPlayerCharacter;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DRAGONREALM_API UDRLockOnComponent : public UActorComponent
+class DRAGONREALM_API UDRBaseLockOnComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Ctor
-	UDRLockOnComponent();
+	UDRBaseLockOnComponent();
 
 	UFUNCTION(BlueprintCallable)
 	void SearchForTargetables();

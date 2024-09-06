@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "DRInteractionComponent.generated.h"
+#include "DRBaseInteractionComponent.generated.h"
 
 
 class UDRWorldUserWidget;
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class DRAGONREALM_API UDRInteractionComponent : public UActorComponent
+class DRAGONREALM_API UDRBaseInteractionComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Ctor
-	UDRInteractionComponent();
+	UDRBaseInteractionComponent();
 
 	// Unreal Functions
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

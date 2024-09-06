@@ -4,10 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "DRGameModeBase.generated.h"
+#include "DRBaseGameMode.generated.h"
 
 class UDRMonsterData;
-class UDRSaveGame;
+class UDRBaseSaveGame;
 class UDataTable;
 class UEnvQueryInstanceBlueprintWrapper;
 class UEnvQuery;
@@ -47,14 +47,14 @@ public:
 
 // GameMode
 UCLASS()
-class DRAGONREALM_API ADRGameModeBase : public AGameModeBase
+class DRAGONREALM_API ADRBaseGameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 
 	// Ctor
-	ADRGameModeBase();
+	ADRBaseGameMode();
 	
 	// Unreal Functions
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
@@ -66,7 +66,7 @@ public:
 	
 	// SaveGame
 	UFUNCTION(BlueprintCallable, Category = "DR|SaveGame")
-	void WriteSaveGame(FString InSaveGameName = "DRSaveGame");
+	void WriteSaveGame(FString InSaveGameName = "DRBaseSaveGame");
 	void LoadSaveGame();
 
 	// Console Functions
@@ -92,7 +92,7 @@ protected:
 	// SaveGame
 	FString SaveSlotName;
 	UPROPERTY()
-	UDRSaveGame* CurrentSaveGame;
+	UDRBaseSaveGame* CurrentSaveGame;
 
 	// Timer
 	FTimerHandle TimerHandle_SpawnBots;

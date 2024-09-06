@@ -21,7 +21,7 @@ void ADRTargetDummy::OnHealthChanged(AActor* InstigatorActor, UDRAttributeCompon
 
 		if(NewHealth <= 0.0f)
 		{
-			AttributeComponent->FullHeal(InstigatorActor);
+			//AttributeComponent->FullHeal(InstigatorActor);
 		}
 	}
 }

@@ -9,8 +9,8 @@
 
 struct FGameplayEffectContextHandle;
 class UGameplayEffect;
-class UDRCharacterMovementComponent;
-//class UDRAbilitySystemComponent;
+class UDRBaseCharacterMovementComponent;
+class UDRBaseAbilitySystemComponent;
 class UDRAttributeComponent;
 class UDRActionComponent;
 UCLASS()
@@ -39,11 +39,10 @@ protected:
 	UDRActionComponent* ActionComponent;
 	*/
 	
-
-
 	// Unreal Overrides
 	virtual void PostInitializeComponents() override;
-	
+
+	// Basic Damage text popup
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Assignables")
 	TSubclassOf<UUserWidget> DamagePopupClass;
 	UFUNCTION()
@@ -53,7 +52,7 @@ protected:
 #pragma region CustomMovementComponent
 public:
 	UFUNCTION(BlueprintPure)
-	FORCEINLINE UDRCharacterMovementComponent* GetDRCharacterMovement() const { return DRCharacterMovementComponent; }
+	FORCEINLINE UDRBaseCharacterMovementComponent* GetDRCharacterMovement() const { return DRBaseCharacterMovementComponent; }
 
 	bool bPressedDRJump;
 	virtual void Jump() override;
@@ -62,7 +61,7 @@ public:
 protected:
 	// Custom movement component for alt movement modes like flying, sliding, and wall running
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Movement")
-	UDRCharacterMovementComponent* DRCharacterMovementComponent;
+	UDRBaseCharacterMovementComponent* DRBaseCharacterMovementComponent;
 
 #pragma endregion 
 // CMC -------------------------------------------------------------------------------------------
@@ -71,21 +70,21 @@ protected:
 #pragma region AbilitySystem
 public:
 	// Implement IAbilitySystemInterface
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	bool ApplGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, FGameplayEffectContextHandle EffectContext);
 	
 protected:
 	// Custom Ability System Component Responsible for all Attributes and Abilities
-	TWeakObjectPtr<class UDRAbilitySystemComponent> AbilitySystemComponent;
-	TWeakObjectPtr<class UDRBaseAttributeSet> BaseAttributeSet;
+	UPROPERTY(EditDefaultsOnly)
+	UDRBaseAbilitySystemComponent* AbilitySystemComponent;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DR|AS|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultAttributeSet;
 
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "DR|AS|Abilities")
-	TArray<TSubclassOf<class UDRGameplayAbility>> DefaultCharacterAbilities;
+	TArray<TSubclassOf<class UDRBaseGameplayAbility>> DefaultCharacterAbilities;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DR|AS|Effects")
 	TArray<TSubclassOf<UGameplayEffect>> DefaultEffects;

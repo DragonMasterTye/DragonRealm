@@ -111,7 +111,7 @@ void ADRAICharacter::SetTargetActor(AActor* NewTarget)
 
 bool ADRAICharacter::IsAlive()
 {
-	return AttributeComponent->IsAlive();
+	return true; // AttributeComponent->IsAlive();
 }
 
 void ADRAICharacter::OnPawnSeen_Implementation(APawn* Pawn)

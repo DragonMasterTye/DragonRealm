@@ -7,8 +7,8 @@
 #include "GameFramework/PlayerState.h"
 #include "DRPlayerState.generated.h"
 
-class UDRAbilitySystemComponent;
-class UDRSaveGame;
+class UDRBaseAbilitySystemComponent;
+class UDRBaseSaveGame;
 class ADRPlayerState;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEXPChanged, ADRPlayerState*, PlayerState, int32, NewEXP, int32, Delta);
 
@@ -25,7 +25,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
-	UDRAbilitySystemComponent* DRASC;
+	UDRBaseAbilitySystemComponent* DRASC;
 
 	// Properties
 	UPROPERTY(BlueprintAssignable, Category = "DR|Events")
@@ -41,9 +41,9 @@ public:
 
 	// SaveGame
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|SaveGame")
-	void SavePlayerState(UDRSaveGame* SaveObject);
+	void SavePlayerState(UDRBaseSaveGame* SaveObject);
 	UFUNCTION(BlueprintNativeEvent, Category = "DR|SaveGame")
-	void LoadPlayerState(UDRSaveGame* SaveObject);
+	void LoadPlayerState(UDRBaseSaveGame* SaveObject);
 	
 protected:
 

@@ -1,11 +1,11 @@
 // Copyright Landon Morrison 2024
 
 
-#include "AbilitySystem/AttributeSets/DRAttributeSetBase.h"
+#include "AbilitySystem/AttributeSets/DRBaseAttributeSet.h"
 #include "GameplayEffectExtension.h"
 #include "Net/UnrealNetwork.h"
 
-void UDRAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
+void UDRBaseAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
 
@@ -16,20 +16,20 @@ void UDRAttributeSetBase::PostGameplayEffectExecute(const FGameplayEffectModCall
 	}
 }
 
-void UDRAttributeSetBase::OnRep_Health(const FGameplayAttributeData& OldValue)
+void UDRBaseAttributeSet::OnRep_Health(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UDRAttributeSetBase, Health, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDRBaseAttributeSet, Health, OldValue);
 }
 
-void UDRAttributeSetBase::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
+void UDRBaseAttributeSet::OnRep_MaxHealth(const FGameplayAttributeData& OldValue)
 {
-	GAMEPLAYATTRIBUTE_REPNOTIFY(UDRAttributeSetBase, MaxHealth, OldValue);
+	GAMEPLAYATTRIBUTE_REPNOTIFY(UDRBaseAttributeSet, MaxHealth, OldValue);
 }
 
-void UDRAttributeSetBase::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+void UDRBaseAttributeSet::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION_NOTIFY(UDRAttributeSetBase, Health, COND_None, REPNOTIFY_Always);
-	DOREPLIFETIME_CONDITION_NOTIFY(UDRAttributeSetBase, MaxHealth, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDRBaseAttributeSet, Health, COND_None, REPNOTIFY_Always);
+	DOREPLIFETIME_CONDITION_NOTIFY(UDRBaseAttributeSet, MaxHealth, COND_None, REPNOTIFY_Always);
 }

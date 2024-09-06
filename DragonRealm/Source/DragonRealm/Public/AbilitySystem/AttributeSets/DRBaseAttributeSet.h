@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
-#include "DRAttributeSetBase.generated.h"
+#include "DRBaseAttributeSet.generated.h"
 
 #define ATTRIBUTE_ACCESSORS(ClassName, PropertyName) \
 GAMEPLAYATTRIBUTE_PROPERTY_GETTER(ClassName, PropertyName) \
@@ -14,18 +14,18 @@ GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName) \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
 UCLASS()
-class DRAGONREALM_API UDRAttributeSetBase : public UAttributeSet
+class DRAGONREALM_API UDRBaseAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 
 public:
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Health, Category = "DR|AS|Attributes|Health")
 	FGameplayAttributeData Health;
-	ATTRIBUTE_ACCESSORS(UDRAttributeSetBase, Health);
+	ATTRIBUTE_ACCESSORS(UDRBaseAttributeSet, Health);
 
 	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxHealth, Category = "DR|AS|Attributes|Health")
 	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UDRAttributeSetBase, MaxHealth);
+	ATTRIBUTE_ACCESSORS(UDRBaseAttributeSet, MaxHealth);
 
 protected:
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;

@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "DRCharacterMovementComponent.generated.h"
+#include "DRBaseCharacterMovementComponent.generated.h"
 
 class ADRBaseCharacter;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FDashStartDelegate);
@@ -22,7 +22,7 @@ enum ECustomMovementMode
 
 
 UCLASS()
-class DRAGONREALM_API UDRCharacterMovementComponent : public UCharacterMovementComponent
+class DRAGONREALM_API UDRBaseCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
 
@@ -168,7 +168,7 @@ public:
 	UPROPERTY(BlueprintAssignable) FDashStartDelegate DashStartDelegate;
 
 	// Ctor
-	UDRCharacterMovementComponent();
+	UDRBaseCharacterMovementComponent();
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 

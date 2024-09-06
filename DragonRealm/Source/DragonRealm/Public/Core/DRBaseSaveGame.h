@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/SaveGame.h"
-#include "DRSaveGame.generated.h"
+#include "DRBaseSaveGame.generated.h"
 
 USTRUCT()
 struct FActorSaveData
@@ -22,7 +22,7 @@ public:
 };
 
 UCLASS()
-class DRAGONREALM_API UDRSaveGame : public USaveGame
+class DRAGONREALM_API UDRBaseSaveGame : public USaveGame
 {
 	GENERATED_BODY()
 

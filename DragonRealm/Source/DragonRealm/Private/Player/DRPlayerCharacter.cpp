@@ -5,15 +5,15 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Core/DRInteractionComponent.h"
+#include "Core/DRBaseInteractionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "ActionSystem/Projectiles/DRProjectile.h"
 #include "ActionSystem/DRActionComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Core/DRCharacterMovementComponent.h"
-#include "Core/DRLockOnComponent.h"
+#include "Core/DRBaseCharacterMovementComponent.h"
+#include "Core/DRBaseLockOnComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -32,8 +32,8 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
 	// Imaginary(Actor) Components
-	InteractionComponent = CreateDefaultSubobject<UDRInteractionComponent>("InteractionComponent");
-	LockOnComponent = CreateDefaultSubobject<UDRLockOnComponent>("LockOnComponent");
+	InteractionComponent = CreateDefaultSubobject<UDRBaseInteractionComponent>("InteractionComponent");
+	LockOnComponent = CreateDefaultSubobject<UDRBaseLockOnComponent>("LockOnComponent");
 	
 	// Setting Defaults
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -73,8 +73,8 @@ void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(Input_Interact, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryInteract);
 
 	// Sprint
-	EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Started, this, &ADRPlayerCharacter::StartSprint);
-	EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Completed, this, &ADRPlayerCharacter::StopSprint);
+	//EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Started, this, &ADRPlayerCharacter::StartSprint);
+	//EnhancedInputComponent->BindAction(Input_Sprint, ETriggerEvent::Completed, this, &ADRPlayerCharacter::StopSprint);
 
 	// Mouse & Keyboard
 	EnhancedInputComponent->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::LookMouse);
@@ -82,9 +82,9 @@ void ADRPlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInputComponent->BindAction(Input_LookGamepad, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::LookGamepad);
 
 	// Actions
-	EnhancedInputComponent->BindAction(Input_PrimaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryAction);
-	EnhancedInputComponent->BindAction(Input_SecondaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::SecondaryAction);
-	EnhancedInputComponent->BindAction(Input_UltimateAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::UltimateAction);
+	//EnhancedInputComponent->BindAction(Input_PrimaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::PrimaryAction);
+	//EnhancedInputComponent->BindAction(Input_SecondaryAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::SecondaryAction);
+	//EnhancedInputComponent->BindAction(Input_UltimateAction, ETriggerEvent::Triggered, this, &ADRPlayerCharacter::UltimateAction);
 	
 }
 
@@ -157,10 +157,10 @@ void ADRPlayerCharacter::LookGamepad(const FInputActionValue& InputValue)
 }
 
 // Utility Functions
-void ADRPlayerCharacter::DR_HealSelf(float Amount /* = 100 */)
+/*void ADRPlayerCharacter::DR_HealSelf(float Amount /* = 100 )
 {
 	AttributeComponent->ApplyHealthChange(this, Amount);
-}
+}*/
 
 // Interaction
 void ADRPlayerCharacter::PrimaryInteract()
@@ -190,6 +190,7 @@ void ADRPlayerCharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeCo
 	}
 }
 
+/*
 // Actions
 void ADRPlayerCharacter::StartSprint()
 {
@@ -214,4 +215,4 @@ void ADRPlayerCharacter::SecondaryAction()
 void ADRPlayerCharacter::UltimateAction()
 {
 	ActionComponent->StartActionByName(this, "UltimateAction");
-}
+}*/

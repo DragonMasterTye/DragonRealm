@@ -3,7 +3,7 @@
 
 #include "ActionSystem/DRAttributeComponent.h"
 
-#include "Core/DRGameModeBase.h"
+#include "Core/DRBaseGameMode.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "Net/Core/PushModel/PushModel.h"
@@ -92,7 +92,7 @@ bool UDRAttributeComponent::ApplyHealthChange(AActor* InstigatorActor, float Del
 		// Check if Killed
 		if(ActualDelta < 0.f && Health <= 0.f)
 		{
-			ADRGameModeBase* GM = GetWorld()->GetAuthGameMode<ADRGameModeBase>();
+			ADRBaseGameMode* GM = GetWorld()->GetAuthGameMode<ADRBaseGameMode>();
 			if(GM)
 			{
 				GM->OnActorKilled(GetOwner(), InstigatorActor);

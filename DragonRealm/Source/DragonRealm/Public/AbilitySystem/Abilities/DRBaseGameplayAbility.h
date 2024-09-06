@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "DRGameplayAbility.generated.h"
+#include "DRBaseGameplayAbility.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DRAGONREALM_API UDRGameplayAbility : public UGameplayAbility
+class DRAGONREALM_API UDRBaseGameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 	

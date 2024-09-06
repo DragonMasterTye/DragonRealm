@@ -1,4 +1,4 @@
-#include "Core/DRCharacterMovementComponent.h"
+#include "Core/DRBaseCharacterMovementComponent.h"
 
 #include "Core/DRBaseCharacter.h"
 #include "Components/CapsuleComponent.h"
@@ -23,7 +23,7 @@ float MacroDuration = 2.f;
 
 // SavedMove
 #pragma region SavedMove
-UDRCharacterMovementComponent::FSavedMove_DR::FSavedMove_DR()
+UDRBaseCharacterMovementComponent::FSavedMove_DR::FSavedMove_DR()
 {
 	Saved_bPressedDRJump = 0;
 	Saved_bPrevWantsToCrouch = 0;
@@ -38,7 +38,7 @@ UDRCharacterMovementComponent::FSavedMove_DR::FSavedMove_DR()
 }
 
 // Checking if we can save bandwidth by sharing data from the same type of move
-bool UDRCharacterMovementComponent::FSavedMove_DR::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const
+bool UDRBaseCharacterMovementComponent::FSavedMove_DR::CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InCharacter, float MaxDelta) const
 {
 	const FSavedMove_DR* NewDRMove = static_cast<FSavedMove_DR*>(NewMove.Get());
 
@@ -60,7 +60,7 @@ bool UDRCharacterMovementComponent::FSavedMove_DR::CanCombineWith(const FSavedMo
 	return FSavedMove_Character::CanCombineWith(NewMove, InCharacter, MaxDelta);
 }
 
-void UDRCharacterMovementComponent::FSavedMove_DR::Clear()
+void UDRBaseCharacterMovementComponent::FSavedMove_DR::Clear()
 {
 	FSavedMove_Character::Clear();
 
@@ -77,7 +77,7 @@ void UDRCharacterMovementComponent::FSavedMove_DR::Clear()
 }
 
 // Unpacking compressed flags to determine movement mode
-uint8 UDRCharacterMovementComponent::FSavedMove_DR::GetCompressedFlags() const
+uint8 UDRBaseCharacterMovementComponent::FSavedMove_DR::GetCompressedFlags() const
 {
 	uint8 Result = FSavedMove_Character::GetCompressedFlags();
 
@@ -89,11 +89,11 @@ uint8 UDRCharacterMovementComponent::FSavedMove_DR::GetCompressedFlags() const
 }
 
 // Update all movement mode flags on client
-void UDRCharacterMovementComponent::FSavedMove_DR::SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
+void UDRBaseCharacterMovementComponent::FSavedMove_DR::SetMoveFor(ACharacter* C, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
 {
 	FSavedMove_Character::SetMoveFor(C, InDeltaTime, NewAccel, ClientData);
 	
-	const UDRCharacterMovementComponent* CharacterMovement = Cast<UDRCharacterMovementComponent>(C->GetCharacterMovement());
+	const UDRBaseCharacterMovementComponent* CharacterMovement = Cast<UDRBaseCharacterMovementComponent>(C->GetCharacterMovement());
 
 	Saved_bPressedDRJump = CharacterMovement->DRCharacterOwner->bPressedDRJump;
 	Saved_bPrevWantsToCrouch = CharacterMovement->Safe_bPrevWantsToCrouch;
@@ -108,11 +108,11 @@ void UDRCharacterMovementComponent::FSavedMove_DR::SetMoveFor(ACharacter* C, flo
 }
 
 // Saved all movement mode flags to send to server
-void UDRCharacterMovementComponent::FSavedMove_DR::PrepMoveFor(ACharacter* C)
+void UDRBaseCharacterMovementComponent::FSavedMove_DR::PrepMoveFor(ACharacter* C)
 {
 	FSavedMove_Character::PrepMoveFor(C);
 
-	UDRCharacterMovementComponent* CharacterMovement = Cast<UDRCharacterMovementComponent>(C->GetCharacterMovement());
+	UDRBaseCharacterMovementComponent* CharacterMovement = Cast<UDRBaseCharacterMovementComponent>(C->GetCharacterMovement());
 
 	CharacterMovement->DRCharacterOwner->bPressedDRJump = Saved_bPressedDRJump;
 	CharacterMovement->Safe_bPrevWantsToCrouch = Saved_bPrevWantsToCrouch;
@@ -131,13 +131,13 @@ void UDRCharacterMovementComponent::FSavedMove_DR::PrepMoveFor(ACharacter* C)
 // NetworkData
 #pragma region ClientNetworkPredictionData
 // Overriding in case I want to make updates in here later
-UDRCharacterMovementComponent::FNetworkPredictionData_Client_DR::FNetworkPredictionData_Client_DR(const UCharacterMovementComponent& ClientMovement)
+UDRBaseCharacterMovementComponent::FNetworkPredictionData_Client_DR::FNetworkPredictionData_Client_DR(const UCharacterMovementComponent& ClientMovement)
 : Super(ClientMovement)
 {
 }
 
 // Telling Unreal to use the custom SavedMove
-FSavedMovePtr UDRCharacterMovementComponent::FNetworkPredictionData_Client_DR::AllocateNewMove()
+FSavedMovePtr UDRBaseCharacterMovementComponent::FNetworkPredictionData_Client_DR::AllocateNewMove()
 {
 	return FSavedMovePtr(new FSavedMove_DR());
 }
@@ -146,14 +146,14 @@ FSavedMovePtr UDRCharacterMovementComponent::FNetworkPredictionData_Client_DR::A
 
 // CCMC
 #pragma region CustomCharacterMovementComponent
-UDRCharacterMovementComponent::UDRCharacterMovementComponent()
+UDRBaseCharacterMovementComponent::UDRBaseCharacterMovementComponent()
 {
 	NavAgentProps.bCanCrouch = true;
 	DRServerMoveBitWriter.SetAllowResize(true);
 }
 
 // @TODO Get rid of tick when possible
-void UDRCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UDRBaseCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -169,7 +169,7 @@ void UDRCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick Ti
 	}
 }
 
-void UDRCharacterMovementComponent::InitializeComponent()
+void UDRBaseCharacterMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
@@ -177,7 +177,7 @@ void UDRCharacterMovementComponent::InitializeComponent()
 }
 
 // Networking
-void UDRCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
+void UDRBaseCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);
 
@@ -185,7 +185,7 @@ void UDRCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	Safe_bWantsToDash = (Flags & FSavedMove_DR::FLAG_Dash) != 0;
 }
 
-void UDRCharacterMovementComponent::OnClientCorrectionReceived(FNetworkPredictionData_Client_Character& ClientData,
+void UDRBaseCharacterMovementComponent::OnClientCorrectionReceived(FNetworkPredictionData_Client_Character& ClientData,
 	float TimeStamp, FVector NewLocation, FVector NewVelocity, UPrimitiveComponent* NewBase, FName NewBaseBoneName,
 	bool bHasBase, bool bBaseRelativePosition, uint8 ServerMovementMode, FVector ServerGravityDirection)
 {
@@ -197,13 +197,13 @@ void UDRCharacterMovementComponent::OnClientCorrectionReceived(FNetworkPredictio
 }
 
 
-FNetworkPredictionData_Client* UDRCharacterMovementComponent::GetPredictionData_Client() const
+FNetworkPredictionData_Client* UDRBaseCharacterMovementComponent::GetPredictionData_Client() const
 {
 	check(PawnOwner != nullptr)
 
 	if (ClientPredictionData == nullptr)
 	{
-		UDRCharacterMovementComponent* MutableThis = const_cast<UDRCharacterMovementComponent*>(this);
+		UDRBaseCharacterMovementComponent* MutableThis = const_cast<UDRBaseCharacterMovementComponent*>(this);
 
 		MutableThis->ClientPredictionData = new FNetworkPredictionData_Client_DR(*this);
 		// @TODO run more tests on these magic numbers to determine best options ( or make them adaptable )
@@ -215,17 +215,17 @@ FNetworkPredictionData_Client* UDRCharacterMovementComponent::GetPredictionData_
 }
 
 // Getters / Helpers
-bool UDRCharacterMovementComponent::IsMovingOnGround() const
+bool UDRBaseCharacterMovementComponent::IsMovingOnGround() const
 {
 	return Super::IsMovingOnGround() || IsCustomMovementMode(CMOVE_Slide);
 }
 
-bool UDRCharacterMovementComponent::CanCrouchInCurrentState() const
+bool UDRBaseCharacterMovementComponent::CanCrouchInCurrentState() const
 {
 	return Super::CanCrouchInCurrentState() && IsMovingOnGround();
 }
 
-float UDRCharacterMovementComponent::GetMaxSpeed() const
+float UDRBaseCharacterMovementComponent::GetMaxSpeed() const
 {
 	if (IsMovementMode(MOVE_Walking) && Safe_bWantsToSprint && !IsCrouching()) return MaxSprintSpeed;
 	
@@ -247,7 +247,7 @@ float UDRCharacterMovementComponent::GetMaxSpeed() const
 	}
 }
 
-float UDRCharacterMovementComponent::GetMaxBrakingDeceleration() const
+float UDRBaseCharacterMovementComponent::GetMaxBrakingDeceleration() const
 {
 	if (MovementMode != MOVE_Custom) return Super::GetMaxBrakingDeceleration();
 
@@ -268,12 +268,12 @@ float UDRCharacterMovementComponent::GetMaxBrakingDeceleration() const
 }
 
 // Unreal functions have been overriden to allow jumping off of walls
-bool UDRCharacterMovementComponent::CanAttemptJump() const
+bool UDRBaseCharacterMovementComponent::CanAttemptJump() const
 {
 	return Super::CanAttemptJump() || IsWallRunning() || IsHanging() || IsClimbing();
 }
 
-bool UDRCharacterMovementComponent::DoJump(bool bReplayingMoves)
+bool UDRBaseCharacterMovementComponent::DoJump(bool bReplayingMoves)
 {
 	bool bWasWallRunning = IsWallRunning();
 	bool bWasOnWall = IsHanging() || IsClimbing();
@@ -305,7 +305,7 @@ bool UDRCharacterMovementComponent::DoJump(bool bReplayingMoves)
 }
 
 // Movement Pipeline
-void UDRCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
+void UDRBaseCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float DeltaSeconds)
 {
 	// Slide
 	if (MovementMode == MOVE_Walking && !bWantsToCrouch && Safe_bPrevWantsToCrouch)
@@ -411,7 +411,7 @@ void UDRCharacterMovementComponent::UpdateCharacterStateBeforeMovement(float Del
 	Super::UpdateCharacterStateBeforeMovement(DeltaSeconds);
 }
 
-void UDRCharacterMovementComponent::UpdateCharacterStateAfterMovement(float DeltaSeconds)
+void UDRBaseCharacterMovementComponent::UpdateCharacterStateAfterMovement(float DeltaSeconds)
 {
 	Super::UpdateCharacterStateAfterMovement(DeltaSeconds);
 
@@ -431,7 +431,7 @@ void UDRCharacterMovementComponent::UpdateCharacterStateAfterMovement(float Delt
 	Safe_bHadAnimRootMotion = HasAnimRootMotion();
 }
 
-void UDRCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
+void UDRBaseCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations)
 {
 	Super::PhysCustom(deltaTime, Iterations);
 
@@ -452,7 +452,7 @@ void UDRCharacterMovementComponent::PhysCustom(float deltaTime, int32 Iterations
 		UE_LOG(LogTemp, Fatal, TEXT("Invalid Movement Mode"))
 	}
 }
-void UDRCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
+void UDRBaseCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const FVector& OldLocation, const FVector& OldVelocity)
 {
 	Super::OnMovementUpdated(DeltaSeconds, OldLocation, OldVelocity);
 	
@@ -460,7 +460,7 @@ void UDRCharacterMovementComponent::OnMovementUpdated(float DeltaSeconds, const 
 }
 
 // Movement Event
-void UDRCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
+void UDRBaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
 
@@ -483,7 +483,7 @@ void UDRCharacterMovementComponent::OnMovementModeChanged(EMovementMode Previous
 	}
 }
 
-bool UDRCharacterMovementComponent::ServerCheckClientError(float ClientTimeStamp, float DeltaTime,
+bool UDRBaseCharacterMovementComponent::ServerCheckClientError(float ClientTimeStamp, float DeltaTime,
 	const FVector& Accel, const FVector& ClientWorldLocation, const FVector& RelativeClientLocation,
 	UPrimitiveComponent* ClientMovementBase, FName ClientBaseBoneName, uint8 ClientMovementMode)
 {
@@ -503,7 +503,7 @@ bool UDRCharacterMovementComponent::ServerCheckClientError(float ClientTimeStamp
 }
 
 
-void UDRCharacterMovementComponent::CallServerMovePacked(const FSavedMove_Character* NewMove, const FSavedMove_Character* PendingMove, const FSavedMove_Character* OldMove)
+void UDRBaseCharacterMovementComponent::CallServerMovePacked(const FSavedMove_Character* NewMove, const FSavedMove_Character* PendingMove, const FSavedMove_Character* OldMove)
 {
 	// Get storage container we'll be using and fill it with movement data
 	FCharacterNetworkMoveDataContainer& MoveDataContainer = GetNetworkMoveDataContainer();
@@ -554,7 +554,7 @@ void UDRCharacterMovementComponent::CallServerMovePacked(const FSavedMove_Charac
 
 #pragma region Slide
 
-void UDRCharacterMovementComponent::EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode)
+void UDRBaseCharacterMovementComponent::EnterSlide(EMovementMode PrevMode, ECustomMovementMode PrevCustomMode)
 {
 	bWantsToCrouch = true;
 	bOrientRotationToMovement = false;
@@ -562,12 +562,12 @@ void UDRCharacterMovementComponent::EnterSlide(EMovementMode PrevMode, ECustomMo
 
 	FindFloor(UpdatedComponent->GetComponentLocation(), CurrentFloor, true, NULL);
 }
-void UDRCharacterMovementComponent::ExitSlide()
+void UDRBaseCharacterMovementComponent::ExitSlide()
 {
 	bWantsToCrouch = false;
 	bOrientRotationToMovement = true;
 }
-bool UDRCharacterMovementComponent::CanSlide() const
+bool UDRBaseCharacterMovementComponent::CanSlide() const
 {
 	FVector Start = UpdatedComponent->GetComponentLocation();
 	FVector End = Start + CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight() * 2.5f * FVector::DownVector;
@@ -578,7 +578,7 @@ bool UDRCharacterMovementComponent::CanSlide() const
 	return bValidSurface && bEnoughSpeed;
 }
 
-void UDRCharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
+void UDRBaseCharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
 {
 	if (deltaTime < MIN_TICK_TIME)
 	{
@@ -788,17 +788,17 @@ void UDRCharacterMovementComponent::PhysSlide(float deltaTime, int32 Iterations)
 
 #pragma region Dash
 
-void UDRCharacterMovementComponent::OnDashCooldownFinished()
+void UDRBaseCharacterMovementComponent::OnDashCooldownFinished()
 {
 	Safe_bWantsToDash = true;
 }
 
-bool UDRCharacterMovementComponent::CanDash() const
+bool UDRBaseCharacterMovementComponent::CanDash() const
 {
 	return IsWalking() && !IsCrouching() || IsFalling();
 }
 
-void UDRCharacterMovementComponent::PerformDash()
+void UDRBaseCharacterMovementComponent::PerformDash()
 {
 	DashStartTime = GetWorld()->GetTimeSeconds();
 	
@@ -813,7 +813,7 @@ void UDRCharacterMovementComponent::PerformDash()
 
 #pragma region Mantle
 
-bool UDRCharacterMovementComponent::TryMantle()
+bool UDRBaseCharacterMovementComponent::TryMantle()
 {
 	if (!(IsMovementMode(MOVE_Walking) && !IsCrouching()) && !IsMovementMode(MOVE_Falling)) return false;
 
@@ -941,7 +941,7 @@ SLOG(FString::Printf(TEXT("Duration: %f"), TransitionRMS->Duration))
 	return true;
 }
 
-FVector UDRCharacterMovementComponent::GetMantleStartLocation(FHitResult FrontHit, FHitResult SurfaceHit, bool bTallMantle) const
+FVector UDRBaseCharacterMovementComponent::GetMantleStartLocation(FHitResult FrontHit, FHitResult SurfaceHit, bool bTallMantle) const
 {
 	float CosWallSteepnessAngle = FrontHit.Normal | FVector::UpVector;
 	float DownDistance = bTallMantle ? CapHH() * 2.f : MaxStepHeight - 1;
@@ -961,7 +961,7 @@ FVector UDRCharacterMovementComponent::GetMantleStartLocation(FHitResult FrontHi
 
 
 #pragma region Wall Run
-bool UDRCharacterMovementComponent::TryWallRun()
+bool UDRBaseCharacterMovementComponent::TryWallRun()
 {
 	if (!IsFalling()) return false;
 	if (Velocity.SizeSquared2D() < pow(MinWallRunSpeed, 2)) return false;
@@ -1007,7 +1007,7 @@ SLOG("Starting WallRun")
 	return true;
 }
 
-void UDRCharacterMovementComponent::PhysWallRun(float deltaTime, int32 Iterations)
+void UDRBaseCharacterMovementComponent::PhysWallRun(float deltaTime, int32 Iterations)
 {
 	if (deltaTime < MIN_TICK_TIME)
 	{
@@ -1097,7 +1097,7 @@ void UDRCharacterMovementComponent::PhysWallRun(float deltaTime, int32 Iteration
 	}
 }
 
-bool UDRCharacterMovementComponent::TryHang()
+bool UDRBaseCharacterMovementComponent::TryHang()
 {
 	if (!IsMovementMode(MOVE_Falling)) return false;
 
@@ -1174,7 +1174,7 @@ bool UDRCharacterMovementComponent::TryHang()
 	return true;
 }
 
-bool UDRCharacterMovementComponent::TryClimb()
+bool UDRBaseCharacterMovementComponent::TryClimb()
 {
 	if (!IsFalling()) return false;
 
@@ -1194,7 +1194,7 @@ bool UDRCharacterMovementComponent::TryClimb()
 	return true;
 }
 
-void UDRCharacterMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
+void UDRBaseCharacterMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 {
 	if (deltaTime < MIN_TICK_TIME)
 	{
@@ -1245,17 +1245,17 @@ void UDRCharacterMovementComponent::PhysClimb(float deltaTime, int32 Iterations)
 
 #pragma region Helpers
 
-bool UDRCharacterMovementComponent::IsServer() const
+bool UDRBaseCharacterMovementComponent::IsServer() const
 {
 	return CharacterOwner->HasAuthority();
 }
 
-float UDRCharacterMovementComponent::CapR() const
+float UDRBaseCharacterMovementComponent::CapR() const
 {
 	return CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleRadius();
 }
 
-float UDRCharacterMovementComponent::CapHH() const
+float UDRBaseCharacterMovementComponent::CapHH() const
 {
 	return CharacterOwner->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 }
@@ -1264,25 +1264,25 @@ float UDRCharacterMovementComponent::CapHH() const
 
 #pragma region Interface
 
-void UDRCharacterMovementComponent::SprintPressed()
+void UDRBaseCharacterMovementComponent::SprintPressed()
 {
 	Safe_bWantsToSprint = true;
 }
-void UDRCharacterMovementComponent::SprintReleased()
+void UDRBaseCharacterMovementComponent::SprintReleased()
 {
 	Safe_bWantsToSprint = false;
 }
 
-void UDRCharacterMovementComponent::CrouchPressed()
+void UDRBaseCharacterMovementComponent::CrouchPressed()
 {
 	bWantsToCrouch = !bWantsToCrouch;
 }
-void UDRCharacterMovementComponent::CrouchReleased()
+void UDRBaseCharacterMovementComponent::CrouchReleased()
 {
 	
 }
 
-void UDRCharacterMovementComponent::DashPressed()
+void UDRBaseCharacterMovementComponent::DashPressed()
 {
 	float CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime - DashStartTime >= DashCooldownDuration)
@@ -1291,30 +1291,30 @@ void UDRCharacterMovementComponent::DashPressed()
 	}
 	else
 	{
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle_DashCooldown, this, &UDRCharacterMovementComponent::OnDashCooldownFinished, DashCooldownDuration - (CurrentTime - DashStartTime));
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle_DashCooldown, this, &UDRBaseCharacterMovementComponent::OnDashCooldownFinished, DashCooldownDuration - (CurrentTime - DashStartTime));
 	}
 }
-void UDRCharacterMovementComponent::DashReleased()
+void UDRBaseCharacterMovementComponent::DashReleased()
 {
 	GetWorld()->GetTimerManager().ClearTimer(TimerHandle_DashCooldown);
 	Safe_bWantsToDash = false;
 }
 
-void UDRCharacterMovementComponent::ClimbPressed()
+void UDRBaseCharacterMovementComponent::ClimbPressed()
 {
 	if (IsFalling() || IsClimbing() || IsHanging()) bWantsToCrouch = true;
 }
 
-void UDRCharacterMovementComponent::ClimbReleased()
+void UDRBaseCharacterMovementComponent::ClimbReleased()
 {
 	bWantsToCrouch = false;
 }
 
-bool UDRCharacterMovementComponent::IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const
+bool UDRBaseCharacterMovementComponent::IsCustomMovementMode(ECustomMovementMode InCustomMovementMode) const
 {
 	return MovementMode == MOVE_Custom && CustomMovementMode == InCustomMovementMode;
 }
-bool UDRCharacterMovementComponent::IsMovementMode(EMovementMode InMovementMode) const
+bool UDRBaseCharacterMovementComponent::IsMovementMode(EMovementMode InMovementMode) const
 {
 	return InMovementMode == MovementMode;
 }
@@ -1323,28 +1323,28 @@ bool UDRCharacterMovementComponent::IsMovementMode(EMovementMode InMovementMode)
 
 #pragma region Replication
 
-void UDRCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+void UDRBaseCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME_CONDITION(UDRCharacterMovementComponent, Proxy_bDash, COND_SkipOwner)
+	DOREPLIFETIME_CONDITION(UDRBaseCharacterMovementComponent, Proxy_bDash, COND_SkipOwner)
 	
-	DOREPLIFETIME_CONDITION(UDRCharacterMovementComponent, Proxy_bShortMantle, COND_SkipOwner)
-	DOREPLIFETIME_CONDITION(UDRCharacterMovementComponent, Proxy_bTallMantle, COND_SkipOwner)
+	DOREPLIFETIME_CONDITION(UDRBaseCharacterMovementComponent, Proxy_bShortMantle, COND_SkipOwner)
+	DOREPLIFETIME_CONDITION(UDRBaseCharacterMovementComponent, Proxy_bTallMantle, COND_SkipOwner)
 }
 
-void UDRCharacterMovementComponent::OnRep_Dash()
+void UDRBaseCharacterMovementComponent::OnRep_Dash()
 {
 	CharacterOwner->PlayAnimMontage(DashMontage);
     DashStartDelegate.Broadcast();
 }
 
-void UDRCharacterMovementComponent::OnRep_ShortMantle()
+void UDRBaseCharacterMovementComponent::OnRep_ShortMantle()
 {
 	CharacterOwner->PlayAnimMontage(ProxyShortMantleMontage);
 }
 
-void UDRCharacterMovementComponent::OnRep_TallMantle()
+void UDRBaseCharacterMovementComponent::OnRep_TallMantle()
 {
 	CharacterOwner->PlayAnimMontage(ProxyTallMantleMontage);
 }

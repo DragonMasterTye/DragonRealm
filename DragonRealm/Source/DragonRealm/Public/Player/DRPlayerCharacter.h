@@ -11,11 +11,11 @@ struct FInputActionValue;
 struct FInputActionInstance;
 class UInputAction;
 class UInputMappingContext;
-class UDRLockOnComponent;
+class UDRBaseLockOnComponent;
 class UDRActionComponent;
 class ADRProjectile;
 class UDRAttributeComponent;
-class UDRInteractionComponent;
+class UDRBaseInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
 UCLASS()
@@ -32,8 +32,8 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	// Utility for testing healing
-	UFUNCTION(Exec)
-	void DR_HealSelf(float Amount = 100.f);
+	//UFUNCTION(Exec)
+	//void DR_HealSelf(float Amount = 100.f);
 
 	// Getters
 	UFUNCTION()
@@ -51,9 +51,9 @@ protected:
 	
 	// Imaginary(Actor) Components
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-    UDRInteractionComponent* InteractionComponent;
+    UDRBaseInteractionComponent* InteractionComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UDRLockOnComponent* LockOnComponent;
+	UDRBaseLockOnComponent* LockOnComponent;
 	
 	//  Properties
 	/*UPROPERTY(EditAnywhere, Category="DR|Assignables")
@@ -85,12 +85,14 @@ protected:
 	// Health and Death
 	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta) override;
 
+	/*
 	// Actions
 	void StartSprint();
 	void StopSprint();
 	void PrimaryAction();
 	void SecondaryAction();
 	void UltimateAction();
+	*/
 
 	// Input
 	UPROPERTY(EditDefaultsOnly, Category = "Input")

@@ -1,13 +1,13 @@
 // Copyright Landon Morrison 2024
 
 
-#include "Core/DRAnimInstance.h"
+#include "Core/DRBaseAnimInstance.h"
 
 #include "GameplayTagContainer.h"
 #include "ActionSystem/DRActionComponent.h"
 
 // Unreal Functions
-void UDRAnimInstance::NativeInitializeAnimation()
+void UDRBaseAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
@@ -18,7 +18,7 @@ void UDRAnimInstance::NativeInitializeAnimation()
 	}
 }
 
-void UDRAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UDRBaseAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 

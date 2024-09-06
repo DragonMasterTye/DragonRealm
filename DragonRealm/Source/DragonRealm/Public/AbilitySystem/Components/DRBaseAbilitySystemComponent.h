@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "DRAbilitySystemComponentBase.generated.h"
+#include "DRBaseAbilitySystemComponent.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class DRAGONREALM_API UDRAbilitySystemComponentBase : public UAbilitySystemComponent
+class DRAGONREALM_API UDRBaseAbilitySystemComponent : public UAbilitySystemComponent
 {
 	GENERATED_BODY()
 	

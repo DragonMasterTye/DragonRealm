@@ -1,7 +1,7 @@
 // Copyright Landon Morrison 2024
 
 
-#include "Core/DRGameModeBase.h"
+#include "Core/DRBaseGameMode.h"
 
 #include "AI/DRAICharacter.h"
 #include "EngineUtils.h"
@@ -13,7 +13,7 @@
 #include "ActionSystem/DRAttributeComponent.h"
 #include "AI/Data/DRMonsterData.h"
 #include "Core/DRGameplayInterface.h"
-#include "Core/DRSaveGame.h"
+#include "Core/DRBaseSaveGame.h"
 #include "DragonRealm/DragonRealm.h"
 #include "Engine/AssetManager.h"
 #include "GameFramework/GameStateBase.h"
@@ -25,15 +25,15 @@
 static TAutoConsoleVariable<bool> CVarSpawnBots(TEXT("DR.SpawnBots"), false, TEXT("Enable Spawning of bots via timer"), ECVF_Cheat);
 
 // Ctor
-ADRGameModeBase::ADRGameModeBase()
+ADRBaseGameMode::ADRBaseGameMode()
 {
 	SpawnTimerInterval = 2.f;
 	RespawnDelay = 2.f;
-	SaveSlotName = "DRSaveGame";
+	SaveSlotName = "DRBaseSaveGame";
 }
 
 // Unreal Functions
-void ADRGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+void ADRBaseGameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
@@ -46,14 +46,14 @@ void ADRGameModeBase::InitGame(const FString& MapName, const FString& Options, F
 	LoadSaveGame();
 }
 
-void ADRGameModeBase::StartPlay()
+void ADRBaseGameMode::StartPlay()
 {
 	Super::StartPlay();
 
-	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ADRGameModeBase::SpawnBotTimerElapsed, SpawnTimerInterval, true);
+	GetWorldTimerManager().SetTimer(TimerHandle_SpawnBots, this, &ADRBaseGameMode::SpawnBotTimerElapsed, SpawnTimerInterval, true);
 }
 
-void ADRGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
+void ADRBaseGameMode::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
 	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 
@@ -66,7 +66,7 @@ void ADRGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* 
 
 // Functions------------------------------------------------------
 // Save Game
-void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
+void ADRBaseGameMode::WriteSaveGame(FString InSaveGameName /* = "DRBaseSaveGame" */)
 {
 	SaveSlotName = InSaveGameName;
 
@@ -110,11 +110,11 @@ void ADRGameModeBase::WriteSaveGame(FString InSaveGameName /* = "DRSaveGame" */)
 }
 
 // Load Game
-void ADRGameModeBase::LoadSaveGame()
+void ADRBaseGameMode::LoadSaveGame()
 {
 	if(UGameplayStatics::DoesSaveGameExist(SaveSlotName, 0))
 	{
-		CurrentSaveGame = Cast<UDRSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
+		CurrentSaveGame = Cast<UDRBaseSaveGame>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, 0));
 		if(CurrentSaveGame == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed to load SaveGame Data"));
@@ -154,7 +154,7 @@ void ADRGameModeBase::LoadSaveGame()
 	}
 	else// No SaveGameObject in that slot, create a new one
 	{
-		CurrentSaveGame = Cast<UDRSaveGame>(UGameplayStatics::CreateSaveGameObject(UDRSaveGame::StaticClass()));
+		CurrentSaveGame = Cast<UDRBaseSaveGame>(UGameplayStatics::CreateSaveGameObject(UDRBaseSaveGame::StaticClass()));
 		
 		UE_LOG(LogTemp, Warning, TEXT("Created New SaveGame Data"));
 	}
@@ -162,7 +162,7 @@ void ADRGameModeBase::LoadSaveGame()
 }
 
 // Kill Tracking
-void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
+void ADRBaseGameMode::OnActorKilled(AActor* Victim, AActor* Killer)
 {
 	ADRPlayerCharacter* PlayerChar = Cast<ADRPlayerCharacter>(Victim);
 	if(PlayerChar)
@@ -178,7 +178,7 @@ void ADRGameModeBase::OnActorKilled(AActor* Victim, AActor* Killer)
 	UE_LOG(LogTemp, Log, TEXT("OnActorKilled: Victim: %s, Killer: %s"), *GetNameSafe(Victim), *GetNameSafe(Killer));
 }
 
-void ADRGameModeBase::OnRespawnPlayerTimerElapsed(AController* Controller)
+void ADRBaseGameMode::OnRespawnPlayerTimerElapsed(AController* Controller)
 {
 	if(Controller)
 	{
@@ -189,7 +189,7 @@ void ADRGameModeBase::OnRespawnPlayerTimerElapsed(AController* Controller)
 }
 
 // Debug Bot Spawning
-void ADRGameModeBase::SpawnBotTimerElapsed()
+void ADRBaseGameMode::SpawnBotTimerElapsed()
 {
 	if(!CVarSpawnBots.GetValueOnGameThread())
 	{
@@ -221,11 +221,11 @@ void ADRGameModeBase::SpawnBotTimerElapsed()
 
 	if(ensureAlways(QueryInstance))
 	{
-		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ADRGameModeBase::OnBotSpawnQueryCompleted);
+		QueryInstance->GetOnQueryFinishedEvent().AddDynamic(this, &ADRBaseGameMode::OnBotSpawnQueryCompleted);
 	}
 }
 
-void ADRGameModeBase::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
+void ADRBaseGameMode::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance,
 	EEnvQueryStatus::Type QueryStatus)
 {
 	if(QueryStatus != EEnvQueryStatus::Success)
@@ -257,7 +257,7 @@ void ADRGameModeBase::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper
 					//DRLogOnScreen(this, "Loading Monster...", FColor::Green);
 					
 					TArray<FName> Bundles; // Tagged Data to be loaded (i.e. UI or In-Game)
-					FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ADRGameModeBase::OnMonsterLoaded, SelectedInfoRow->MonsterDataID, Locations[0]); // Triggers OnMonsterLoaded and passes Params
+					FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(this, &ADRBaseGameMode::OnMonsterLoaded, SelectedInfoRow->MonsterDataID, Locations[0]); // Triggers OnMonsterLoaded and passes Params
 					
 					Manager->LoadPrimaryAsset(SelectedInfoRow->MonsterDataID, Bundles, Delegate);
 				}
@@ -267,7 +267,7 @@ void ADRGameModeBase::OnBotSpawnQueryCompleted(UEnvQueryInstanceBlueprintWrapper
 	//}
 }
 
-void ADRGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLocation)
+void ADRBaseGameMode::OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLocation)
 {
 	//DRLogOnScreen(this, "Finished Loading", FColor::Green);
 
@@ -298,7 +298,7 @@ void ADRGameModeBase::OnMonsterLoaded(FPrimaryAssetId LoadedID, FVector SpawnLoc
 }
 
 // Console Functions
-void ADRGameModeBase::DR_KillAllAI()
+void ADRBaseGameMode::DR_KillAllAI()
 {
 	for(TActorIterator<ADRAICharacter> It(GetWorld()); It; ++It)
 	{

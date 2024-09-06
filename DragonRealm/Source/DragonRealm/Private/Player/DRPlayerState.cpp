@@ -3,12 +3,12 @@
 
 #include "Player/DRPlayerState.h"
 
-#include "AbilitySystem/DRAbilitySystemComponent.h"
-#include "Core/DRSaveGame.h"
+#include "AbilitySystem/Components/DRBaseAbilitySystemComponent.h"
+#include "Core/DRBaseSaveGame.h"
 
 ADRPlayerState::ADRPlayerState()
 {
-	DRASC = CreateDefaultSubobject<UDRAbilitySystemComponent>("AbilitySystemComponent");
+	DRASC = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>("AbilitySystemComponent");
 }
 
 UAbilitySystemComponent* ADRPlayerState::GetAbilitySystemComponent() const
@@ -36,7 +36,7 @@ void ADRPlayerState::RemoveExp(int32 EXPToRemove)
 }
 
 // SaveGame
-void ADRPlayerState::SavePlayerState_Implementation(UDRSaveGame* SaveObject)
+void ADRPlayerState::SavePlayerState_Implementation(UDRBaseSaveGame* SaveObject)
 {
 	if(SaveObject)
 	{
@@ -44,7 +44,7 @@ void ADRPlayerState::SavePlayerState_Implementation(UDRSaveGame* SaveObject)
 	}
 }
 
-void ADRPlayerState::LoadPlayerState_Implementation(UDRSaveGame* SaveObject)
+void ADRPlayerState::LoadPlayerState_Implementation(UDRBaseSaveGame* SaveObject)
 {
 	if(SaveObject)
 	{

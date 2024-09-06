@@ -3,26 +3,26 @@
 
 #include "Core/DRBaseCharacter.h"
 
-#include "AbilitySystem/DRAbilitySystemComponent.h"
+#include "AbilitySystem/Components/DRBaseAbilitySystemComponent.h"
 #include "ActionSystem/DRActionComponent.h"
 #include "ActionSystem/DRAttributeComponent.h"
 #include "Blueprint/UserWidget.h"
-#include "Core/DRCharacterMovementComponent.h"
+#include "Core/DRBaseCharacterMovementComponent.h"
 
 // Ctor
 ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
-: Super(ObjectInitializer.SetDefaultSubobjectClass<UDRCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+: Super(ObjectInitializer.SetDefaultSubobjectClass<UDRBaseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {	
 	PrimaryActorTick.bCanEverTick = false;
 
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	DRCharacterMovementComponent = Cast<UDRCharacterMovementComponent>(GetCharacterMovement());
-	DRCharacterMovementComponent->SetIsReplicated(true);
+	DRBaseCharacterMovementComponent = Cast<UDRBaseCharacterMovementComponent>(GetCharacterMovement());
+	DRBaseCharacterMovementComponent->SetIsReplicated(true);
 	
-	AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
-	ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
-	AbilitySystemComponent = CreateDefaultSubobject<UDRAbilitySystemComponent>("DRAbilitySystemComponent");
+	//AttributeComponent = CreateDefaultSubobject<UDRAttributeComponent>("AttributeComponent");
+	//ActionComponent = CreateDefaultSubobject<UDRActionComponent>("ActionComponent");
+	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>("DRBaseAbilitySystemComponent");
 }
 
 FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
@@ -56,7 +56,29 @@ void ADRBaseCharacter::StopJumping()
 
 UAbilitySystemComponent* ADRBaseCharacter::GetAbilitySystemComponent() const
 {
-	return AbilitySystemComponent.Get();
+	return AbilitySystemComponent;
+}
+
+void ADRBaseCharacter::InitializeAttributes()
+{
+}
+
+void ADRBaseCharacter::GiveAbilities()
+{
+}
+
+void ADRBaseCharacter::ApplyStartupEffects()
+{
+}
+
+void ADRBaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+}
+
+void ADRBaseCharacter::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
 }
 
 void ADRBaseCharacter::PostInitializeComponents()

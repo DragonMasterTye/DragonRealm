@@ -4,12 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "DRAnimInstance.generated.h"
+#include "DRBaseAnimInstance.generated.h"
 
 
 class UDRActionComponent;
 UCLASS()
-class DRAGONREALM_API UDRAnimInstance : public UAnimInstance
+class DRAGONREALM_API UDRBaseAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
