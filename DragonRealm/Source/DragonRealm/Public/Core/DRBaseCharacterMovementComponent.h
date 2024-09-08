@@ -25,7 +25,7 @@ UCLASS()
 class DRAGONREALM_API UDRBaseCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
-
+/*
 // SavedMove
 #pragma region SavedMove
 	class FSavedMove_DR : public FSavedMove_Character
@@ -260,5 +260,5 @@ public:
 private:
 	UFUNCTION() void OnRep_Dash();
 	UFUNCTION() void OnRep_ShortMantle();
-	UFUNCTION() void OnRep_TallMantle();
+	UFUNCTION() void OnRep_TallMantle();*/
 };

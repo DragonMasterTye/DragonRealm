@@ -24,7 +24,8 @@ class DRAGONREALM_API ADRBaseCharacter : public ACharacter, public IAbilitySyste
 
 public:
 	// Ctor
-	ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	//ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	ADRBaseCharacter();
 	
 	FCollisionQueryParams GetIgnoreCharacterParams() const;
 
@@ -49,9 +50,11 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta);
-
+	
+// CURRENTLY DISABLED
 // CMC -------------------------------------------------------------------------------------------
 #pragma region CustomMovementComponent
+	/*
 public:
 	UFUNCTION(BlueprintPure)
 	FORCEINLINE UDRBaseCharacterMovementComponent* GetDRCharacterMovement() const { return DRBaseCharacterMovementComponent; }
@@ -64,9 +67,10 @@ protected:
 	// Custom movement component for alt movement modes like flying, sliding, and wall running
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "DR|Movement")
 	UDRBaseCharacterMovementComponent* DRBaseCharacterMovementComponent;
-
+*/
 #pragma endregion 
 // CMC -------------------------------------------------------------------------------------------
+// CURRENTLY DISABLED
 
 // AbilitySystem -------------------------------------------------------------------------------------------
 #pragma region AbilitySystem

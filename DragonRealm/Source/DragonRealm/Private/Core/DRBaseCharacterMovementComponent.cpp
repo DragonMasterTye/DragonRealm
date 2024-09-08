@@ -20,7 +20,7 @@ float MacroDuration = 2.f;
 #define CAPSULE(x, c)
 #endif
 
-
+/*
 // SavedMove
 #pragma region SavedMove
 UDRBaseCharacterMovementComponent::FSavedMove_DR::FSavedMove_DR()
@@ -1350,3 +1350,4 @@ void UDRBaseCharacterMovementComponent::OnRep_TallMantle()
 }
 
 #pragma endregion
+*/

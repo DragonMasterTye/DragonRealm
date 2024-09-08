@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "DRPlayerCharacter.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogDRPlayerCharacter, Log, All);
+
 struct FInputActionValue;
 struct FInputActionInstance;
 class UInputAction;
@@ -18,11 +20,67 @@ class UDRAttributeComponent;
 class UDRBaseInteractionComponent;
 class UCameraComponent;
 class USpringArmComponent;
-UCLASS()
+
+UCLASS(config=Game)
 class DRAGONREALM_API ADRPlayerCharacter : public ADRBaseCharacter
 {
 	GENERATED_BODY()
 
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	UCameraComponent* FollowCamera;
+	
+	/** MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DefaultMappingContext;
+	
+	/** Jump Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* IA_Jump;
+
+	/** Move Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* IA_Move;
+
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* IA_Look;
+
+public:
+	
+	ADRPlayerCharacter();
+
+protected:
+
+	/** Called for movement input */
+	void Move(const FInputActionValue& Value);
+
+	/** Called for looking input */
+	void Look(const FInputActionValue& Value);
+
+protected:
+	// APawn interface
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	// To add mapping context
+	virtual void BeginPlay();
+
+public:
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/////////////////////////////////////////////
+	//
+	// REFACTORING IN PROGRESS
+	//
+	/////////////////////////////////////////////
+	/*
 public:
 	// Ctor
 	ADRPlayerCharacter();
@@ -67,7 +125,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category="Abilities")
 	FName AbilitySpawnSocket;
 	UPROPERTY(VisibleAnywhere, Category = "Effects")
-	FName TimeOfHitParamName;*/
+	FName TimeOfHitParamName;
 
 	// Unreal Functions
 	virtual FVector GetPawnViewLocation() const override;
@@ -92,7 +150,7 @@ protected:
 	void PrimaryAction();
 	void SecondaryAction();
 	void UltimateAction();
-	*/
+	
 
 	// Input
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -115,5 +173,5 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	UInputAction* Input_SecondaryAction;
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
-	UInputAction* Input_UltimateAction;
+	UInputAction* Input_UltimateAction;*/
 };

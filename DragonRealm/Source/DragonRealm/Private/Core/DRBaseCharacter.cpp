@@ -12,7 +12,7 @@
 #include "Core/DRBaseCharacterMovementComponent.h"
 
 // Ctor
-ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
+/*ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<UDRBaseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {	
 	PrimaryActorTick.bCanEverTick = false;
@@ -27,6 +27,17 @@ ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
 	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("DRBaseAttributeSet"));
+}*/
+
+ADRBaseCharacter::ADRBaseCharacter()
+{
+	GetMesh()->SetGenerateOverlapEvents(true);
+
+	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("ASC"));
+	AbilitySystemComponent->SetIsReplicated(true);
+	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	
+	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("AttributeSet"));
 }
 
 FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
@@ -55,8 +66,11 @@ void ADRBaseCharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComp
 	}
 }
 
+
+// CURRENTLY DISABLED
 // CMC -------------------------------------------------------------------------------------------
 #pragma region CustomCharacterMovement
+/*
 void ADRBaseCharacter::Jump()
 {
 	bPressedDRJump = true;
@@ -72,9 +86,10 @@ void ADRBaseCharacter::StopJumping()
 {
 	bPressedDRJump = false;
 	Super::StopJumping();
-}
+}*/
 #pragma endregion
 // CMC -------------------------------------------------------------------------------------------
+// CURRENTLY DISABLED
 
 // AbilitySystem -------------------------------------------------------------------------------------------
 #pragma region AbilitySystem

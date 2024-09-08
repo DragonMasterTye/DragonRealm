@@ -42,7 +42,7 @@ void UDRBaseLockOnComponent::SearchForTargetables()
 	// to access all *Relevant* Pawns and then see if they are within the bounds, @todo try this
 	Owner = Cast<ADRPlayerCharacter>(GetOwner());
 	// Cone Trace using multiple Sphere Traces of expanding size
-	UCameraComponent* Camera = Owner->GetCamera();
+	UCameraComponent* Camera = Owner->GetFollowCamera();
 	ConeTraceOffset = Camera->GetComponentLocation(); // Starting Position
 	for(float i = 1; i < (ConeTraceSteps + 1); i++)
 	{
