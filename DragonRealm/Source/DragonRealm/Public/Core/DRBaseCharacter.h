@@ -72,7 +72,9 @@ protected:
 // CMC -------------------------------------------------------------------------------------------
 // CURRENTLY DISABLED
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AbilitySystem -------------------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region AbilitySystem
 public:
 	// Implement IAbilitySystemInterface
@@ -82,7 +84,7 @@ public:
 	
 protected:
 	// Custom Ability System Component Responsible for all Attributes and Abilities
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UDRBaseAbilitySystemComponent* AbilitySystemComponent;
 
 	UPROPERTY(Transient)
@@ -111,5 +113,7 @@ protected:
 	virtual void OnRep_PlayerState() override;
 
 #pragma endregion
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AbilitySystem -------------------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 };

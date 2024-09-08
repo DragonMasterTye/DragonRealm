@@ -33,7 +33,7 @@ ADRBaseCharacter::ADRBaseCharacter()
 {
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("ASC"));
+	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
@@ -91,7 +91,9 @@ void ADRBaseCharacter::StopJumping()
 // CMC -------------------------------------------------------------------------------------------
 // CURRENTLY DISABLED
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AbilitySystem -------------------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma region AbilitySystem
 UAbilitySystemComponent* ADRBaseCharacter::GetAbilitySystemComponent() const
 {
@@ -141,7 +143,7 @@ void ADRBaseCharacter::GiveAbilities()
 
 void ADRBaseCharacter::ApplyStartupEffects()
 {
-	if(HasAuthority() && DefaultAttributeSet && AttributeSet)
+	if(HasAuthority())
 	{
 		FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
 		EffectContextHandle.AddSourceObject(this);
@@ -173,4 +175,6 @@ bool ADRBaseCharacter::ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Ef
 }
 
 #pragma endregion
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AbilitySystem -------------------------------------------------------------------------------------------
+////////////////////////////////////////////////////////////////////////////////////////////////////////////
