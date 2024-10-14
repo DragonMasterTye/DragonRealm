@@ -25,7 +25,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
-	UDRBaseAbilitySystemComponent* DRASC;
+	UDRBaseAbilitySystemComponent* AbilitySystemComponent;
 
 	// Properties
 	UPROPERTY(BlueprintAssignable, Category = "DR|Events")

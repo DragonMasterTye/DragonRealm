@@ -8,12 +8,12 @@
 
 ADRPlayerState::ADRPlayerState()
 {
-	DRASC = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>("AbilitySystemComponent");
+	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>("AbilitySystemComponent");
 }
 
 UAbilitySystemComponent* ADRPlayerState::GetAbilitySystemComponent() const
 {
-	return DRASC;
+	return AbilitySystemComponent;
 }
 
 int32 ADRPlayerState::GetEXP() const

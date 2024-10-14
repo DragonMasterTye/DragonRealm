@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "DRBaseDataTypes.h"
+#include "AbilitySystem/DataAssets/DRBaseCharacterDataAsset.h"
 #include "GameFramework/Character.h"
 #include "DRBaseCharacter.generated.h"
 
@@ -50,6 +52,8 @@ protected:
 	
 	UFUNCTION()
 	virtual void OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth, float DesiredDelta, float ActualDelta);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 // CURRENTLY DISABLED
 // CMC -------------------------------------------------------------------------------------------
@@ -81,6 +85,12 @@ public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	bool ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Effect, float Level, FGameplayEffectContextHandle EffectContext);
+
+	UFUNCTION(BlueprintCallable)
+	FDRCharacterData GetCharacterData() const;
+
+	UFUNCTION(BlueprintCallable)
+	void SetCharacterData(const FDRCharacterData& InCharacterData);
 	
 protected:
 	// Custom Ability System Component Responsible for all Attributes and Abilities
@@ -90,10 +100,11 @@ protected:
 	UPROPERTY(Transient)
 	UDRBaseAttributeSet* AttributeSet;
 
+	/* DEPRECATED
 	// We should not modify attributes directly so we have this set of effects to do it instead
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DR|AS|Attributes")
 	TSubclassOf<UGameplayEffect> DefaultAttributeSet;
-
+	
 	// Default abilities for this Character. These will be removed on Character death and regiven if Character respawns.
 	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "DR|AS|Abilities")
 	TArray<TSubclassOf<UGameplayAbility>> DefaultAbilities;
@@ -101,9 +112,12 @@ protected:
 	// Default Effects such as health regen
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly, Category = "DR|AS|Effects")
 	TArray<TSubclassOf<UGameplayEffect>> DefaultEffects;
-
+	*/
+	
 	// Initialization functions
+	/* DEPRECATED
 	void InitializeAttributes();
+	*/
 	void GiveAbilities();
 	void ApplyStartupEffects();
 
@@ -111,6 +125,17 @@ protected:
 	virtual void PossessedBy(AController* NewController) override;
 	// Init on Client
 	virtual void OnRep_PlayerState() override;
+
+	UPROPERTY(ReplicatedUsing = OnRep_CharacterData)
+	FDRCharacterData CharacterData;
+
+	UFUNCTION()
+	void OnRep_CharacterData();
+
+	virtual void InitFromCharacterData(const FDRCharacterData& InCharacterData, bool bFromReplication = false);
+
+	UPROPERTY(EditDefaultsOnly)
+	UDRBaseCharacterDataAsset* CharacterDataAsset;
 
 #pragma endregion
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -10,6 +10,7 @@
 #include "ActionSystem/DRAttributeComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Core/DRBaseCharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 
 // Ctor
 /*ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
@@ -55,6 +56,11 @@ FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
 void ADRBaseCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+
+	if(IsValid(CharacterDataAsset))
+	{
+		SetCharacterData(CharacterDataAsset->CharacterData);
+	}
 }
 
 void ADRBaseCharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComponent* OwningComponent, float NewHealth,
@@ -64,6 +70,13 @@ void ADRBaseCharacter::OnHealthChanged(AActor* InstigatorActor, UDRAttributeComp
 	{
 		CreateWidget(GetWorld(), DamagePopupClass)->AddToViewport();
 	}
+}
+
+void ADRBaseCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ADRBaseCharacter, CharacterData);
 }
 
 
@@ -106,7 +119,9 @@ void ADRBaseCharacter::PossessedBy(AController* NewController)
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
+	/* DEPRECATED
 	InitializeAttributes();
+	*/
 	GiveAbilities();
 	ApplyStartupEffects();
 }
@@ -116,9 +131,12 @@ void ADRBaseCharacter::OnRep_PlayerState()
 	Super::OnRep_PlayerState();
 
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	/* DEPRECATED
 	InitializeAttributes();
+	*/
 }
 
+/* DEPRECATED
 void ADRBaseCharacter::InitializeAttributes()
 {
 	if(HasAuthority() && DefaultAttributeSet && AttributeSet)
@@ -129,12 +147,13 @@ void ADRBaseCharacter::InitializeAttributes()
 		ApplyGameplayEffectToSelf(DefaultAttributeSet, 1, EffectContextHandle);
 	}
 }
+*/
 
 void ADRBaseCharacter::GiveAbilities()
 {
 	if(HasAuthority() && AbilitySystemComponent)
 	{
-		for(auto DefaultAbility : DefaultAbilities)
+		for(auto DefaultAbility : CharacterData.Abilities)
 		{
 			AbilitySystemComponent->GiveAbility(FGameplayAbilitySpec(DefaultAbility));
 		}
@@ -148,9 +167,9 @@ void ADRBaseCharacter::ApplyStartupEffects()
 		FGameplayEffectContextHandle EffectContextHandle = AbilitySystemComponent->MakeEffectContext();
 		EffectContextHandle.AddSourceObject(this);
 
-		for(auto Effect : DefaultEffects)
+		for(auto CharacterEffect : CharacterData.Effects)
 		{
-			ApplyGameplayEffectToSelf(Effect, 1, EffectContextHandle);
+			ApplyGameplayEffectToSelf(CharacterEffect, 1, EffectContextHandle);
 		}
 	}
 }
@@ -172,6 +191,28 @@ bool ADRBaseCharacter::ApplyGameplayEffectToSelf(TSubclassOf<UGameplayEffect> Ef
 	}
 	
 	return false;
+}
+
+FDRCharacterData ADRBaseCharacter::GetCharacterData() const
+{
+	return CharacterData;
+}
+
+void ADRBaseCharacter::SetCharacterData(const FDRCharacterData& InCharacterData)
+{
+	CharacterData = InCharacterData;
+
+	InitFromCharacterData(CharacterData);
+}
+
+void ADRBaseCharacter::OnRep_CharacterData()
+{
+	InitFromCharacterData(CharacterData, true);
+}
+
+void ADRBaseCharacter::InitFromCharacterData(const FDRCharacterData& InCharacterData, bool bFromReplication)
+{
+	
 }
 
 #pragma endregion
