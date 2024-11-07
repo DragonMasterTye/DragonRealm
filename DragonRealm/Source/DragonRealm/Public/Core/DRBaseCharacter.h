@@ -1,5 +1,6 @@
 // Copyright Landon Morrison 2024
 
+
 #pragma once
 
 #include "CoreMinimal.h"
@@ -26,22 +27,11 @@ class DRAGONREALM_API ADRBaseCharacter : public ACharacter, public IAbilitySyste
 
 public:
 	// Ctor
-	//ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
-	ADRBaseCharacter();
+	ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	FCollisionQueryParams GetIgnoreCharacterParams() const;
 
 protected:
-	/*
-	 * Built from scratch personal replacement for GAS
-	 * I have decided to use GAS for now so this is disabled
-	// Component Responsible for Attributes such as Health, Mana, and EXP and their replication
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
-	UDRAttributeComponent* AttributeComponent;
-	// Component Responsible for all the use and replication of Actions
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "DR|Components")
-	UDRActionComponent* ActionComponent;
-	*/
 	
 	// Unreal Overrides
 	virtual void PostInitializeComponents() override;

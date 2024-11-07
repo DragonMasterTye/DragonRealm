@@ -13,32 +13,21 @@
 #include "Net/UnrealNetwork.h"
 
 // Ctor
-/*ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
+ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
 : Super(ObjectInitializer.SetDefaultSubobjectClass<UDRBaseCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {	
 	PrimaryActorTick.bCanEverTick = false;
 
 	GetMesh()->SetGenerateOverlapEvents(true);
 
-	DRBaseCharacterMovementComponent = Cast<UDRBaseCharacterMovementComponent>(GetCharacterMovement());
-	DRBaseCharacterMovementComponent->SetIsReplicated(true);
+	//DRBaseCharacterMovementComponent = Cast<UDRBaseCharacterMovementComponent>(GetCharacterMovement());
+	//DRBaseCharacterMovementComponent->SetIsReplicated(true);
 	
 	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("DRBaseAbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
 	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("DRBaseAttributeSet"));
-}*/
-
-ADRBaseCharacter::ADRBaseCharacter()
-{
-	GetMesh()->SetGenerateOverlapEvents(true);
-
-	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AbilitySystemComponent->SetIsReplicated(true);
-	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-	
-	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("AttributeSet"));
 }
 
 FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const

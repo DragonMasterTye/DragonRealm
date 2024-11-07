@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright Landon Morrison 2024
 
 #include "Player/DRPlayerCharacter.h"
 
@@ -20,9 +19,6 @@
 
 DEFINE_LOG_CATEGORY(LogDRPlayerCharacter);
 
-//////////////////////////////////////////////////////////////////////////
-// ADRPlayerCharacter
-
 ADRPlayerCharacter::ADRPlayerCharacter()
 {
 	// Set size for collision capsule
@@ -37,17 +33,6 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
-	/*
-	GetCharacterMovement()->JumpZVelocity = 700.f;
-	GetCharacterMovement()->AirControl = 0.35f;
-	GetCharacterMovement()->MaxWalkSpeed = 500.f;
-	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
-	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
-	*/
-
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
@@ -60,7 +45,7 @@ ADRPlayerCharacter::ADRPlayerCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
-	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+	// are set in the derived blueprint asset named BP_DRPlayerCharacter (to avoid direct content references in C++)
 }
 
 void ADRPlayerCharacter::BeginPlay()

@@ -1,3 +1,6 @@
+// Copyright Landon Morrison 2024
+
+
 #include "Core/DRBaseCharacterMovementComponent.h"
 
 #include "Core/DRBaseCharacter.h"
