@@ -5,8 +5,8 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
-#include "DRBaseDataTypes.h"
-#include "AbilitySystem/DataAssets/DRBaseCharacterDataAsset.h"
+#include "Core/Data/DRBaseDataTypes.h"
+#include "Core/Data/DRBaseCharacterDataAsset.h"
 #include "GameFramework/Character.h"
 #include "DRBaseCharacter.generated.h"
 
