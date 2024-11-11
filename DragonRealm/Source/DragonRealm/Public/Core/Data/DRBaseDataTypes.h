@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "DRBaseDataTypes.generated.h"
 
+class UDRBaseCharacterAnimDataAsset;
 class UGameplayAbility;
 class UGameplayEffect;
 class UBlendSpace;
@@ -20,6 +21,9 @@ struct FDRCharacterData
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "DR|AS")
 	TArray<TSubclassOf<UGameplayAbility>> Abilities;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "DR|Animation")
+	UDRBaseCharacterAnimDataAsset* CharacterAnimDataAsset;
 };
 
 USTRUCT(BlueprintType)
@@ -31,6 +35,6 @@ struct FDRCharacterAnimationData
 	UBlendSpace* GroundMovementBlendSpace = nullptr;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "DR|Animation")
-	UAnimationAsset* GroundIdleAnimation = nullptr;
+	UAnimSequenceBase* GroundIdleAnimation = nullptr;
 	
 };
