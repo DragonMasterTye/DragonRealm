@@ -123,12 +123,7 @@ void ADRPlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-/////////////////////////////////////////////
-//
-// REFACTORING IN PROGRESS
-//
-/////////////////////////////////////////////
-/*
+/* DEPRECATED
 // Ctor
 ADRPlayerCharacter::ADRPlayerCharacter()
 {

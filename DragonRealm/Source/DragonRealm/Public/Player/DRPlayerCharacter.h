@@ -68,12 +68,8 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	/////////////////////////////////////////////
-	//
-	// REFACTORING IN PROGRESS
-	//
-	/////////////////////////////////////////////
-	/*
+
+	/* DEPRECATED
 public:
 	// Ctor
 	ADRPlayerCharacter();
