@@ -19,11 +19,9 @@
 **/UTILS/*
 
 # Art Asset Files and Marketplace content that is too big or subject to copyright
+DragonRealm/Content*
+!DragonRealm/Content/_DragonRealm_*
 DragonRealm/Content/_DragonRealm_/ART*
-DragonRealm/Content/Marketplace/*
-DragonRealm/Content/Paragon/*
-DragonRealm/Content/ParagonAurora/*
-DragonRealm/Content/Characters/*
 
 # Visual Studio 2015 user specific files
 **/.vs/
