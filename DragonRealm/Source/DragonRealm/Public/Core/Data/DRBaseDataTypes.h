@@ -36,5 +36,11 @@ struct FDRCharacterAnimationData
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "DR|Animation")
 	UAnimSequenceBase* GroundIdleAnimation = nullptr;
-	
+};
+
+UENUM(BlueprintType)
+enum class EFoot : uint8
+{
+	Left	UMETA(DisplayName = "Left"),
+	Right	UMETA(DisplayName = "Right")
 };

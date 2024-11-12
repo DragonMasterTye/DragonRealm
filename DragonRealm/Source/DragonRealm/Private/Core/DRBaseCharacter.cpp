@@ -10,6 +10,7 @@
 #include "ActionSystem/DRAttributeComponent.h"
 #include "Blueprint/UserWidget.h"
 #include "Core/DRBaseCharacterMovementComponent.h"
+#include "Core/DRBaseFootstepComponent.h"
 #include "Net/UnrealNetwork.h"
 
 // Ctor
@@ -23,11 +24,13 @@ ADRBaseCharacter::ADRBaseCharacter(const FObjectInitializer& ObjectInitializer)
 	//DRBaseCharacterMovementComponent = Cast<UDRBaseCharacterMovementComponent>(GetCharacterMovement());
 	//DRBaseCharacterMovementComponent->SetIsReplicated(true);
 	
-	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("DRBaseAbilitySystemComponent"));
+	AbilitySystemComponent = CreateDefaultSubobject<UDRBaseAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 	AbilitySystemComponent->SetIsReplicated(true);
 	AbilitySystemComponent->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 	
-	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("DRBaseAttributeSet"));
+	AttributeSet = CreateDefaultSubobject<UDRBaseAttributeSet>(TEXT("AttributeSet"));
+
+	FootstepComponent = CreateDefaultSubobject<UDRBaseFootstepComponent>(TEXT("FootstepComponent"));
 }
 
 FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
@@ -40,6 +43,11 @@ FCollisionQueryParams ADRBaseCharacter::GetIgnoreCharacterParams() const
 	Params.AddIgnoredActor(this);
 
 	return Params;
+}
+
+UDRBaseFootstepComponent* ADRBaseCharacter::GetFootstepComponent() const
+{
+	return FootstepComponent;
 }
 
 void ADRBaseCharacter::PostInitializeComponents()

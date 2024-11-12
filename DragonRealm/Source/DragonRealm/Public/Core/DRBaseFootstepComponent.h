@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Data/DRBaseDataTypes.h"
 #include "DRBaseFootstepComponent.generated.h"
 
 
@@ -15,14 +16,18 @@ class DRAGONREALM_API UDRBaseFootstepComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	UDRBaseFootstepComponent();
+	
+	void HandleFootstep(EFoot Foot);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(EditDefaultsOnly)
+	FName LeftFootSocketName = TEXT("LeftFootSocket");
+	UPROPERTY(EditDefaultsOnly)
+	FName RightFootSocketName = TEXT("RightFootSocket");
 
-		
+	UPROPERTY(EditAnywhere, Category = "DR|Sounds")
+	float FootstepVolume;
 };

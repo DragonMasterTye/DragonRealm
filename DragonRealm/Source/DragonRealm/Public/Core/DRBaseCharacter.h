@@ -11,6 +11,7 @@
 #include "DRBaseCharacter.generated.h"
 
 
+class UDRBaseFootstepComponent;
 struct FGameplayEffectContextHandle;
 class UGameplayEffect;
 class UGameplayAbility;
@@ -30,6 +31,8 @@ public:
 	ADRBaseCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 	
 	FCollisionQueryParams GetIgnoreCharacterParams() const;
+
+	UDRBaseFootstepComponent* GetFootstepComponent() const;
 
 protected:
 	
@@ -66,10 +69,6 @@ protected:
 // CMC -------------------------------------------------------------------------------------------
 // CURRENTLY DISABLED
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// AbilitySystem -------------------------------------------------------------------------------------------
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-#pragma region AbilitySystem
 public:
 	// Implement IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -127,8 +126,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly)
 	UDRBaseCharacterDataAsset* CharacterDataAsset;
 
-#pragma endregion
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// AbilitySystem -------------------------------------------------------------------------------------------
-////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	UPROPERTY(BlueprintReadOnly)
+	UDRBaseFootstepComponent* FootstepComponent;
 };
