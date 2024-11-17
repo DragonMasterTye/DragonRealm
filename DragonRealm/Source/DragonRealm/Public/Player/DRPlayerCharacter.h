@@ -4,6 +4,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "Core/DRBaseCharacter.h"
 #include "GameFramework/Character.h"
 #include "DRPlayerCharacter.generated.h"
@@ -67,6 +68,12 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+protected:
+
+	// Gameplay Events
+	UPROPERTY(EditDefaultsOnly)
+	FGameplayTag JumpEventTag;
 
 
 	/* DEPRECATED
