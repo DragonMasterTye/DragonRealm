@@ -26,6 +26,12 @@ UCLASS()
 class DRAGONREALM_API UDRBaseCharacterMovementComponent : public UCharacterMovementComponent
 {
 	GENERATED_BODY()
+
+protected:
+
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "DR|Movement|Ground")
+	float GroundMovementSpeed = 0.f;
+	
 /*
 // SavedMove
 #pragma region SavedMove
