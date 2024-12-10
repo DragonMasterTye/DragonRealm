@@ -50,7 +50,7 @@ void ADRPlayerCharacter2::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ADRPlayerCharacter2::OnJumpEnded);
 
 	// Attack
-	InputComp->BindAction(Input_PrimaryAttack, ETriggerEvent::Started, this, &ADRPlayerCharacter2::PrimaryAttack);
+	//InputComp->BindAction(Input_PrimaryAttack, ETriggerEvent::Started, this, &ADRPlayerCharacter2::PrimaryAttack);
 }
 
 void ADRPlayerCharacter2::Move(const FInputActionInstance& Instance)
@@ -124,8 +124,10 @@ void ADRPlayerCharacter2::OnJumpEnded(const FInputActionValue& ActionValue)
 {
 }
 
+/*
 // Attacks
 void ADRPlayerCharacter2::PrimaryAttack(const FInputActionValue& InputValue)
 {
-	DRASC->TryActivateAbilityByClass()
+	
 }
+*/

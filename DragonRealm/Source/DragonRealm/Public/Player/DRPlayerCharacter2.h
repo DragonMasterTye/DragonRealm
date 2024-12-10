@@ -56,11 +56,12 @@ protected:
 	/*UPROPERTY(EditDefaultsOnly, Category="DR|Input")
 	TObjectPtr<UInputAction> Input_Sprint;
 	UPROPERTY(EditDefaultsOnly, Category="DR|Input")
-	TObjectPtr<UInputAction> Input_Dash;*/
+	TObjectPtr<UInputAction> Input_Dash;
 	UPROPERTY(EditDefaultsOnly, Category="DR|Input")
 	TObjectPtr<UInputAction> Input_PrimaryAttack;
 	UPROPERTY(EditDefaultsOnly, Category="DR|Input")
 	TObjectPtr<UInputAction> Input_SecondaryAttack;
+	*/
 
 	// Locomotion Functions
 	void Move(const FInputActionInstance& Instance);
@@ -71,7 +72,7 @@ protected:
 	void OnJumpEnded(const FInputActionValue& ActionValue);
 
 	// Attack Functions
-	void PrimaryAttack(const FInputActionValue& InputValue);
+	//void PrimaryAttack(const FInputActionValue& InputValue);
 
 
 	/* Player Input */
