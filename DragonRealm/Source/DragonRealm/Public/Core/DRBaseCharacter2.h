@@ -30,5 +30,6 @@ protected:
 	// DragonRealmAbilitySystemComponent
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta=(AllowPrivateAccess = "true"), Category = "DR|Abilities")
 	TObjectPtr<UDRBaseAbilitySystemComponent> DRASC;
+
 	
 };

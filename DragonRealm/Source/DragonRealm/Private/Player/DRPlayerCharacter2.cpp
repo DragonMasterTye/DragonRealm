@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "AbilitySystem/Components/DRBaseAbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 
@@ -38,11 +39,18 @@ void ADRPlayerCharacter2::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	Subsystem->AddMappingContext(DefaultInputMapping, 0);
 	// New Enhanced Input system
 	UEnhancedInputComponent* InputComp = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-	
+
+	// Locomotion
 	InputComp->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ADRPlayerCharacter2::Move);
 	InputComp->BindAction(Input_LookMouse, ETriggerEvent::Triggered, this, &ADRPlayerCharacter2::LookMouse);
 	InputComp->BindAction(Input_LookGamepad, ETriggerEvent::Triggered, this, &ADRPlayerCharacter2::LookGamepad);
 
+	// Jump
+	InputComp->BindAction(Input_Jump, ETriggerEvent::Started, this, &ADRPlayerCharacter2::OnJumpStarted);
+	InputComp->BindAction(Input_Jump, ETriggerEvent::Completed, this, &ADRPlayerCharacter2::OnJumpEnded);
+
+	// Attack
+	InputComp->BindAction(Input_PrimaryAttack, ETriggerEvent::Started, this, &ADRPlayerCharacter2::PrimaryAttack);
 }
 
 void ADRPlayerCharacter2::Move(const FInputActionInstance& Instance)
@@ -105,4 +113,19 @@ void ADRPlayerCharacter2::LookGamepad(const FInputActionValue& InputValue)
 
 	AddControllerYawInput(Value.X * (LookYawRate * RateMultiplier) * GetWorld()->GetDeltaSeconds());
 	AddControllerPitchInput(Value.Y * (LookPitchRate * RateMultiplier) * GetWorld()->GetDeltaSeconds());
+}
+
+void ADRPlayerCharacter2::OnJumpStarted(const FInputActionValue& ActionValue)
+{
+	Jump();
+}
+
+void ADRPlayerCharacter2::OnJumpEnded(const FInputActionValue& ActionValue)
+{
+}
+
+// Attacks
+void ADRPlayerCharacter2::PrimaryAttack(const FInputActionValue& InputValue)
+{
+	DRASC->TryActivateAbilityByClass()
 }

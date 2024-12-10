@@ -66,6 +66,13 @@ protected:
 	void Move(const FInputActionInstance& Instance);
 	void LookMouse(const FInputActionValue& InputValue);
 	void LookGamepad(const FInputActionValue& InputValue);
+	
+	void OnJumpStarted(const FInputActionValue& ActionValue);
+	void OnJumpEnded(const FInputActionValue& ActionValue);
+
+	// Attack Functions
+	void PrimaryAttack(const FInputActionValue& InputValue);
+
 
 	/* Player Input */
 	///////////////////////////////////////////////////////////////////////////////////////////
